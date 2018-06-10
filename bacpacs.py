@@ -3,6 +3,8 @@ import glob
 from os.path import join
 from Bio import SeqIO
 
+from cdhit import run_cdhit
+
 class Bacpacs(object):
     def __init__(self, output_dir):
         self._output_dir = output_dir
@@ -43,3 +45,14 @@ class Bacpacs(object):
         print 'Saving reduced proteins as {}'.format(output_path)
         self.reduced_path_ = output_path
 
+    def cluster(self, memory=800, n_jobs=1, cdhit_path='.', reduced_path=None, output_path=None):
+        if output_path is None:
+            output_path = join(self._output_dir, 'protein_families')
+        if reduced_path is None:
+            if not hasattr(self, 'reduced_path_'):
+                raise ValueError('No input fasta file')
+            reduced_path = self.reduced_path_
+        print 'Clustering genomes.'
+        run_cdhit(reduced_path, output_path, memory, n_jobs, cdhit_path)
+        print 'Clustering finished successfully. Protein families dump in {}'.format(output_path)
+        self.pf_path_ = output_path
