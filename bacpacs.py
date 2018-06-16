@@ -3,7 +3,7 @@ import warnings
 import pandas as pd
 import numpy as np
 from os import mkdir
-from os.path import join
+from os.path import join, isdir
 from Bio import SeqIO
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
@@ -11,7 +11,10 @@ from util import cdhit, cdhit_2d, orgs_to_vecs
 class Bacpacs(object):
     def __init__(self, output_dir):
         self._output_dir = output_dir
-        mkdir(output_dir)
+        if isdir(output_dir):
+            warnings.warn('Directory {} already exists'.format(output_dir))
+        else:
+            mkdir(output_dir)
 
     def merge_genome_files(self, genomes_dir, output_path=None):
         """Merges the raw training faa files.
@@ -67,7 +70,7 @@ class Bacpacs(object):
         print 'Saving reduced proteins as {}'.format(output_path)
         self.reduced_path_ = output_path
 
-    def cluster(self, memory=800, n_jobs=1, cdhit_path='.', reduced_path=None, output_path=None):
+    def cluster(self, memory=800, n_jobs=1, cdhit_path=None, reduced_path=None, output_path=None):
         """
 
         Parameters
@@ -95,7 +98,7 @@ class Bacpacs(object):
         print 'Clustering finished successfully. Protein families dumped in {}'.format(output_path)
         self.pf_path_ = output_path
 
-    def extract_features(self, genomes_dir, feats_type='pred', memory=800, n_jobs=1, cdhit_path='.',
+    def extract_features(self, genomes_dir, feats_type='pred', memory=800, n_jobs=1, cdhit_path=None,
                          pf_path=None, output_clusters_dir=None, output_features_path=None):
         """Creates feature vectors for training/predicting genomes. Runs CD-HIT-2D for every genome, against the
         previously created protein families.

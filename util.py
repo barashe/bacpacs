@@ -28,7 +28,12 @@ def cdhit(input_path, output_path, m, t, cdhit_path):
         Path to CD-HIT.
 
     """
-    cmd_line = '{}cd-hit -i {} -o {} -c 0.4 -n 2 -M {} -T {}'.format(cdhit_path + '/', input_path, output_path, m, t)
+    if cdhit_path is None:
+        cdhit_path = 'cd-hit'
+    else:
+        cdhit_path = join(cdhit_path, 'cd-hit')
+    cmd_line = '{} -i {} -o {} -c 0.4 -n 2 -M {} -T {}'.format(cdhit_path, input_path, output_path, m, t)
+    print cmd_line
     subprocess.check_call(cmd_line.split())
     unlink(output_path + '.clstr')
 
@@ -52,10 +57,14 @@ def cdhit_2d(org_path, clusters_path, output_dir, m, t, cdhit_path):
         Path to CD-HIT.
 
     """
+    if cdhit_path is None:
+        cdhit_path = 'cd-hit-2d'
+    else:
+        cdhit_path = join(cdhit_path, 'cd-hit-2d')
     org_name = get_file_name(org_path)
     output_path = join(output_dir, org_name)
-    cmd_line = '{}cd-hit-2d -i {} -i2 {} -o {} -c 0.4 -n 2 -d 0 -M {} -T {} -g 1'
-    cmd_line = cmd_line.format(cdhit_path + '/', clusters_path, org_path, output_path, m, t)
+    cmd_line = '{} -i {} -i2 {} -o {} -c 0.4 -n 2 -d 0 -M {} -T {} -g 1'
+    cmd_line = cmd_line.format(cdhit_path, clusters_path, org_path, output_path, m, t)
     subprocess.check_call(cmd_line.split())
     # We are only interested in output_path.clstr, which is automatically created by CD-HIT-2D
     unlink(output_path)
