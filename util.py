@@ -62,8 +62,19 @@ def cdhit_2d(org_path, clusters_path, output_dir, m, t, cdhit_path):
 
 
 def orgs_to_vecs(feat_list, clusters_dir, output_path):
-    # returns a train/test set in the following format
-    # [[org_ids][org_feats][org_pathogenicities]]
+    """Generated a feature pandas.Dataframe, with genome id as index, and protein families features as columns.
+
+    Parameters
+    ----------
+    feat_list : list
+        Feature names, for resulting feature dataframe columns.
+    clusters_dir : basestring
+        Directory in which the relevant CD-HIT-2D clusters are found.
+    output_path : basestring
+        Path to dump resulting features.
+
+    """
+
     cluster_files = glob.glob(join(clusters_dir, '*.clstr'))
     genome_ids = [get_file_name(cluster_file) for cluster_file in cluster_files]
     ids_and_clusters = pd.Series(cluster_files, genome_ids)

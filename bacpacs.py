@@ -5,16 +5,12 @@ import numpy as np
 from os import mkdir
 from os.path import join
 from Bio import SeqIO
-from sklearn.svm import LinearSVC
-
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
 
 class Bacpacs(object):
     def __init__(self, output_dir):
         self._output_dir = output_dir
-
-    CLF_MODEL = LinearSVC('l1', dual=False, class_weight='balanced')
 
     def merge_genome_files(self, genomes_dir, output_path=None):
         """Merges the raw training faa files.
