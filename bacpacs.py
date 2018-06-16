@@ -1,7 +1,11 @@
 import glob
+import warnings
+import pandas as pd
+import numpy as np
 from os import mkdir
 from os.path import join
 from Bio import SeqIO
+from sklearn.svm import LinearSVC
 
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
@@ -10,13 +14,17 @@ class Bacpacs(object):
     def __init__(self, output_dir):
         self._output_dir = output_dir
 
+    CLF_MODEL = LinearSVC('l1', dual=False, class_weight='balanced')
+
     def merge_genome_files(self, genomes_dir, output_path=None):
         """Merges the raw training faa files.
 
         Parameters
         ----------
-        genomes_dir
-        output_path
+        genomes_dir : basestring
+            Path to a directory containing genome .faa files.
+        output_path : basestring, optional
+            Output path. If None, saves 'reduced.faa' in self.output_dir.
 
         """
         if output_path is None:
@@ -42,7 +50,7 @@ class Bacpacs(object):
         merged_path : basestring, optional
             Path to merged faa file. If None, the path used by self.merge_genomes_files is used.
         output_path : basestring, optional
-            Output path. If None, saves 'reduced.faa' in the initial output dir (created in self.merge()).
+            Output path. If None, saves 'reduced.faa' in self.output_dir.
 
         """
         if output_path is None:
@@ -99,7 +107,7 @@ class Bacpacs(object):
         ----------
         genomes_dir : basestring
             Path to a directory containing genome .faa files.
-        feats_type : ['train', 'pred']
+        feats_type : {'train', 'pred'}, optional
             Indication whether genomes are used for training, or for prediction.
         memory : int, optional
             Memory limit (in MB) for CD-HIT-2D, 0 for unlimited.
@@ -150,9 +158,69 @@ class Bacpacs(object):
         print 'Organizing features'
         orgs_to_vecs(feat_list, output_clusters_dir, output_features_path)
         print 'Done. Features dumped to {}'.format(output_features_path)
+        if training:
+            self.train_feats_path_ = output_features_path
+        else:
+            self.pred_feats_path_ = output_features_path
 
-    def train(self):
-        pass
+    def get_features_and_labels(self, labels=None, feats_type='pred', feats_path=None, feat_order=None):
+        """Get features X (pandas.Dataframe) for training/prediction. If 'labels' is not None,
+        a series of pathogenicity labels,y (pandas.Series) is returned as well.
 
-    def predict(self):
-        pass
+        Parameters
+        ----------
+        labels : pandas.Series or basestring, optional
+            Pathogenicity labels. Can either be a csv path, or a pandas.Series. If csv, the file should include two
+            columns; genome id (first), and pathogenicity label (second). If pandas.Series, values should be
+            pathogenicity labels, and indices genome ids. Genome ids should match the genomes .faa
+            file names (without the extension). If this parameter is used, a tuple (X, y) is returned. Otherwise,
+            only X is returned.
+        feats_type : {'train', 'pred'}, optional
+            Indication whether genomes are used for training, or for prediction.
+        feats_path : basestring, optional
+            Path to training/prediction (defined in 'feats_type') features. If None, the path used by
+            self.train_feats/self.pred_feats is used (created in self.extract_features()).
+        feat_order : list, optional
+            Order of features for the resulting feature matrix. If not included, the feature list created in the
+            training feature extraction process is used. If this list does not exist (e.g. when loading a model),
+            the train set feature order is recorded, and used for the prediction set. If this doesn't exist, order is
+            not validated and not guaranteed to be consistent.
+
+        Returns
+        -------
+        X or (X, y) : pandas.Dataframe or  (pd.Dataframe, pd.Series)
+            If labels is None, only features (X) is returned. Otherwise, both features and labels are return in a tuple,
+            indexed by genome ids.
+        """
+        if labels is not None:
+            if isinstance(labels, basestring):
+                labels = pd.read_csv(labels, index_col=0, dtype=np.bool)
+            elif not isinstance(labels, pd.Series):
+                raise ValueError('labels should either be a csv path, pandas.Series, or None')
+        if feats_type == 'train':
+            train = True
+        elif feats_type == 'pred':
+            train = False
+        else:
+            raise ValueError("'feats_type should be 'train' or 'pred'")
+        if feats_path is None:
+            if train:
+                feats_path = self.train_feats_path_
+            else:
+                feats_path = self.pred_feats_path_
+        if feat_order is None:
+            if hasattr(self, 'feat_list_'):
+                feat_order = self.feat_list_
+            else:
+                warnings.warn("Features might not have consistent order. Run self.order_feats() and "
+                              "self.extract_features().")
+        X = pd.read_pickle(feats_path)
+        if feat_order is not None:
+            X = X.loc[:, feat_order]
+        if labels is not None:
+            y = labels.loc[X.index]
+            if y.isnull().any():
+                warnings.warn("Labels include some Null values")
+            return X, y
+        else:
+            return X
