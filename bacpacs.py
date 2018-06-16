@@ -11,6 +11,7 @@ from util import cdhit, cdhit_2d, orgs_to_vecs
 class Bacpacs(object):
     def __init__(self, output_dir):
         self._output_dir = output_dir
+        mkdir(output_dir)
 
     def merge_genome_files(self, genomes_dir, output_path=None):
         """Merges the raw training faa files.
