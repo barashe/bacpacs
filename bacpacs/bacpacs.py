@@ -279,3 +279,24 @@ def get_labels(csv_path, X=None):
     if y.isnull().any():
         warnings.warn('Labels include some Null values')
     return y
+
+
+def get_trained_model(output_dir):
+    """Returns the Bacpacs and sklearn.svm.LinearSVC used to train the official bacpacs model.
+
+    Parameters
+    ----------
+    output_dir : basestring
+        Output directory in which bacpacs will cache files, and store resulting features.
+
+    Returns
+    -------
+    bp : Bacpacs
+        Bacpacs object to generate prediction features.
+    svc : sklearn.svm.LinearSVC
+        Trained estimator to predict new organisms.
+
+    """
+    bp = read_pickle(r'..\trained\full_bacpacs.pkl', output_dir)
+    svc = joblib.load(r'..\trained\linearsvc_full.pkl')
+    return bp, svc
