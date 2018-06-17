@@ -226,7 +226,7 @@ class Bacpacs(object):
         joblib.dump(self, path)
 
 
-def read_pickle(path, outpur_dir):
+def read_pickle(path, output_dir):
     """Load pickled Bacpacs object.
 
     Parameters
@@ -246,7 +246,7 @@ def read_pickle(path, outpur_dir):
         warnings.warn('Directory {} already exists'.format(output_dir))
     else:
         mkdir(output_dir)
-    bp._output_dir = outpur_dir
+    bp._output_dir = output_dir
     return bp
 
 
