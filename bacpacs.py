@@ -1,7 +1,7 @@
 import glob
 import warnings
+import joblib
 import pandas as pd
-import numpy as np
 from os import mkdir
 from os.path import join, isdir
 from Bio import SeqIO
@@ -163,18 +163,12 @@ class Bacpacs(object):
         else:
             self.pred_feats_path_ = output_features_path
 
-    def get_features_and_labels(self, labels=None, feats_type='pred', feats_path=None, feat_order=None):
-        """Get features X (pandas.Dataframe) for training/prediction. If 'labels' is not None,
+    def get_features(self, feats_type='pred', feats_path=None, feat_order=None):
+        """Get features matrix X (pandas.Dataframe) for training/prediction. If 'labels' is not None,
         a series of pathogenicity labels,y (pandas.Series) is returned as well.
 
         Parameters
         ----------
-        labels : pandas.Series or basestring, optional
-            Pathogenicity labels. Can either be a csv path, or a pandas.Series. If csv, the file should include two
-            columns; genome id (first), and pathogenicity label (second). If pandas.Series, values should be
-            pathogenicity labels, and indices genome ids. Genome ids should match the genomes .faa
-            file names (without the extension). If this parameter is used, a tuple (X, y) is returned. Otherwise,
-            only X is returned.
         feats_type : {'train', 'pred'}, optional
             Indication whether genomes are used for training, or for prediction.
         feats_path : basestring, optional
@@ -192,11 +186,6 @@ class Bacpacs(object):
             If labels is None, only features (X) is returned. Otherwise, both features and labels are return in a tuple,
             indexed by genome ids.
         """
-        if labels is not None:
-            if isinstance(labels, basestring):
-                labels = pd.read_csv(labels, index_col=0, dtype=np.bool)
-            elif not isinstance(labels, pd.Series):
-                raise ValueError('labels should either be a csv path, pandas.Series, or None')
         if feats_type == 'train':
             train = True
         elif feats_type == 'pred':
@@ -217,10 +206,64 @@ class Bacpacs(object):
         X = pd.read_pickle(feats_path)
         if feat_order is not None:
             X = X.loc[:, feat_order]
-        if labels is not None:
-            y = labels.loc[X.index]
-            if y.isnull().any():
-                warnings.warn("Labels include some Null values")
-            return X, y
-        else:
-            return X
+        return X
+
+    def to_pickle(self, path):
+        """Dumps the Bacpacs object to a pickle file
+
+        Parameters
+        ----------
+        path : basestring
+            File path where the pickled object will be stored.
+        Returns
+        -------
+
+        """
+        joblib.dump(self, path)
+
+
+def read_pickle(path):
+    """Load pickled Bacpacs object
+    
+    Parameters
+    ----------
+    path : basestring
+        File path where the pickled object will be loaded.
+
+    Returns
+    -------
+    bacpacs : a Bacpacs object
+    """
+
+    return joblib.load(path)
+
+
+def get_labels(csv_path, X=None):
+    """Generates a pandas.Series of pathogenicity labels, given a csv file. the file should include two
+    columns; genome id (first), and pathogenicity label (second).
+
+    Parameters
+    ----------
+    csv_path : basestring
+        Path to csv file. The file should include two columns; genome id (first), and pathogenicity label (second).
+    X : pandas.Dataframe, optional
+        The corresponding feature matrix, with genome ids as index. This is used for ordering purposes. If X is
+        given, the labels returned are sorted according to it.
+
+    Returns
+    -------
+    y : pandas.Series
+        Pathogenicity labels, sorted according to X, if given.
+
+    """
+    if isinstance(csv_path, basestring):
+        y = pd.read_csv(csv_path, index_col=0, dtype=np.bool)
+    else:
+        raise ValueError("'csv_path' is expected to be a string.")
+    if X is not None:
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError("'X' is expected to be a pandas.Dataframe")
+        y = y.loc[X.index]
+    if y.isnull().any():
+        warnings.warn('Labels include some Null values')
+    return y

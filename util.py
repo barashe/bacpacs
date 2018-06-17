@@ -1,14 +1,11 @@
 import subprocess
 import glob
+import warnings
 import numpy as np
 import pandas as pd
 
 from os import unlink
 from os.path import basename, splitext, join
-
-
-def get_file_name(path):
-    return splitext(basename(path))[0]
 
 
 def cdhit(input_path, output_path, m, t, cdhit_path):
@@ -98,3 +95,7 @@ def orgs_to_vecs(feat_list, clusters_dir, output_path):
                 elif line[0] == '1':
                     feat_vec.loc[tmp_feat] = True
     features.to_pickle(output_path)
+
+
+def get_file_name(path):
+    return splitext(basename(path))[0]
