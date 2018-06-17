@@ -10,6 +10,13 @@ from util import cdhit, cdhit_2d, orgs_to_vecs
 
 class Bacpacs(object):
     def __init__(self, output_dir):
+        """Returns a bacpacs object which processes features from raw faa files.
+
+        Parameters
+        ----------
+        output_dir : basestring
+            Output directory in which bacpacs will cache files, and store resulting features.
+        """
         self._output_dir = output_dir
         if isdir(output_dir):
             warnings.warn('Directory {} already exists'.format(output_dir))
