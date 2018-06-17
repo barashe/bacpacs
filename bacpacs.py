@@ -145,12 +145,9 @@ class Bacpacs(object):
             if not hasattr(self, 'pf_path_'):
                 raise ValueError("Please specify a valid 'pf_path' or run self.cluster()")
             pf_path = self.pf_path_
-        if training:
+        if not hasattr(self, 'feat_list_'):
             feat_list = [rec.id for rec in SeqIO.parse(pf_path, 'fasta')]
             self.feat_list_ = feat_list
-        else:
-            if not hasattr(self, 'features_'):
-                raise ValueError("Training features were not yet created. Run with 'feats_type='train''")
         feat_list = self.feat_list_
         print 'Running genomes against protein families representatives'
         for genome in glob.glob(join(genomes_dir, '*.faa')):
