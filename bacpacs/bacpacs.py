@@ -226,20 +226,27 @@ class Bacpacs(object):
         joblib.dump(self, path)
 
 
-def read_pickle(path):
+def read_pickle(path, outpur_dir):
     """Load pickled Bacpacs object
     
     Parameters
     ----------
     path : basestring
         File path where the pickled object will be loaded.
+    output_dir : basestring
+            Output directory in which bacpacs will cache files, and store resulting features.
 
     Returns
     -------
     bacpacs : a Bacpacs object
     """
-
-    return joblib.load(path)
+    bp = joblib.load(path)
+    if isdir(output_dir):
+        warnings.warn('Directory {} already exists'.format(output_dir))
+    else:
+        mkdir(output_dir)
+    bp._output_dir = outpur_dir
+    return bp
 
 
 def get_labels(csv_path, X=None):

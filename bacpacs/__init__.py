@@ -1,1 +1,2 @@
-name = "bacpacs"
+__all__ = ['bacpacs']
+from bacpacs import Bacpacs, read_pickle
