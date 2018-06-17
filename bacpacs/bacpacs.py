@@ -227,18 +227,19 @@ class Bacpacs(object):
 
 
 def read_pickle(path, outpur_dir):
-    """Load pickled Bacpacs object
-    
+    """Load pickled Bacpacs object.
+
     Parameters
     ----------
     path : basestring
         File path where the pickled object will be loaded.
     output_dir : basestring
-            Output directory in which bacpacs will cache files, and store resulting features.
+        Output directory in which bacpacs will cache files, and store resulting features.
 
     Returns
     -------
     bacpacs : a Bacpacs object
+
     """
     bp = joblib.load(path)
     if isdir(output_dir):
