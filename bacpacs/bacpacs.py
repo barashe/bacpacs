@@ -2,6 +2,7 @@ import glob
 import warnings
 import joblib
 import pandas as pd
+import numpy as np
 from os import mkdir
 from os.path import join, isdir
 from Bio import SeqIO
@@ -269,7 +270,7 @@ def get_labels(csv_path, X=None):
 
     """
     if isinstance(csv_path, basestring):
-        y = pd.read_csv(csv_path, index_col=0, dtype=np.bool)
+        y = pd.read_csv('train_labels.csv', header=None, dtype={0: np.object}).set_index(0)[1]
     else:
         raise ValueError("'csv_path' is expected to be a string.")
     if X is not None:
