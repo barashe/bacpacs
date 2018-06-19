@@ -98,3 +98,35 @@ def orgs_to_vecs(feat_list, clusters_dir, output_path):
 
 def get_file_name(path):
     return splitext(basename(path))[0]
+
+
+def read_labels(csv_path, X=None):
+    """Generates a pandas.Series of pathogenicity labels, given a csv file. the file should include two
+    columns; genome id (first), and pathogenicity label (second).
+
+    Parameters
+    ----------
+    csv_path : basestring
+        Path to csv file. The file should include two columns; genome id (first), and pathogenicity label (second).
+    X : pandas.Dataframe, optional
+        The corresponding feature matrix, with genome ids as index. This is used for ordering purposes. If X is
+        given, the labels returned are sorted according to it.
+
+    Returns
+    -------
+    y : pandas.Series
+        Pathogenicity labels, sorted according to X, if given.
+
+    """
+    if isinstance(csv_path, basestring):
+        y = pd.read_csv(csv_path, header=None, dtype={0: np.object}).set_index(0)[1]
+        y.index.name = 'genome_id'
+    else:
+        raise ValueError("'csv_path' is expected to be a string.")
+    if X is not None:
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError("'X' is expected to be a pandas.Dataframe")
+        y = y.loc[X.index]
+    if y.isnull().any():
+        print 'Warning: Labels include null values'
+    return y

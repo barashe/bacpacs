@@ -2,9 +2,9 @@ import glob
 import warnings
 import joblib
 import pandas as pd
-import numpy as np
+import urllib
 from os import mkdir
-from os.path import join, isdir
+from os.path import join, isdir, isfile
 from Bio import SeqIO
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
@@ -251,39 +251,9 @@ def read_pickle(path, output_dir):
     return bp
 
 
-def get_labels(csv_path, X=None):
-    """Generates a pandas.Series of pathogenicity labels, given a csv file. the file should include two
-    columns; genome id (first), and pathogenicity label (second).
-
-    Parameters
-    ----------
-    csv_path : basestring
-        Path to csv file. The file should include two columns; genome id (first), and pathogenicity label (second).
-    X : pandas.Dataframe, optional
-        The corresponding feature matrix, with genome ids as index. This is used for ordering purposes. If X is
-        given, the labels returned are sorted according to it.
-
-    Returns
-    -------
-    y : pandas.Series
-        Pathogenicity labels, sorted according to X, if given.
-
-    """
-    if isinstance(csv_path, basestring):
-        y = pd.read_csv('train_labels.csv', header=None, dtype={0: np.object}).set_index(0)[1]
-    else:
-        raise ValueError("'csv_path' is expected to be a string.")
-    if X is not None:
-        if not isinstance(X, pd.DataFrame):
-            raise ValueError("'X' is expected to be a pandas.Dataframe")
-        y = y.loc[X.index]
-    if y.isnull().any():
-        warnings.warn('Labels include some Null values')
-    return y
-
-
-def get_trained_model(output_dir):
-    """Returns the Bacpacs and sklearn.svm.LinearSVC used to train the official bacpacs model.
+def load_trained_model(output_dir):
+    """Downloads and returns the Bacpacs and sklearn.svm.LinearSVC used to train
+    the official bacpacs model.
 
     Parameters
     ----------
@@ -298,6 +268,29 @@ def get_trained_model(output_dir):
         Trained estimator to predict new organisms.
 
     """
-    bp = read_pickle(r'..\trained\full_bacpacs.pkl', output_dir)
-    svc = joblib.load(r'..\trained\linearsvc_full.pkl')
+
+    urlopener = urllib.URLopener()
+    github_path = 'https://github.com/barashe/bacpacs/blob/master/trained/{}'
+    file_names = ['full_bapcacs.pkl', 'linearsvc_full.pkl', 'protein_families']
+    local_dir = join(output_dir, 'trained_model')
+    if isdir(output_dir):
+        warnings.warn('Directory {} already exists'.format(output_dir))
+    else:
+        mkdir(output_dir)
+    if isdir(local_dir):
+        warnings.warn('Directory {} already exists'.format(local_dir))
+    else:
+        mkdir(local_dir)
+    print 'Retrieving files from github'
+    for file_name in file_names:
+        local_path = join(local_dir, file_name)
+        if not isfile(local_path):
+            print 'Downloading {}'.format(file_name)
+            urlopener.retrieve(github_path.format(file_name), local_path)
+        else:
+            print '{} exists. Skipping.'
+    bp = joblib.load(join(local_dir, 'full_bacpacs.pkl'))
+    bp._output_dir = output_dir
+    bp.pf_path_ = join(local_dir, 'protein_families')
+    svc = joblib.load(join(local_dir, 'linearsvc_full.pkl'))
     return bp, svc
