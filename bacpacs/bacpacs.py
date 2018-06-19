@@ -269,9 +269,8 @@ def load_trained_model(output_dir):
 
     """
 
-    urlopener = urllib.URLopener()
-    github_path = 'https://github.com/barashe/bacpacs/blob/master/trained/{}'
-    file_names = ['full_bapcacs.pkl', 'linearsvc_full.pkl', 'protein_families']
+    github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
+    file_names = ['full_bacpacs.pkl', 'linearsvc_full.pkl', 'protein_families']
     local_dir = join(output_dir, 'trained_model')
     if isdir(output_dir):
         warnings.warn('Directory {} already exists'.format(output_dir))
@@ -286,7 +285,8 @@ def load_trained_model(output_dir):
         local_path = join(local_dir, file_name)
         if not isfile(local_path):
             print 'Downloading {}'.format(file_name)
-            urlopener.retrieve(github_path.format(file_name), local_path)
+            print github_path.format(file_name)
+            urllib.urlretrieve(github_path.format(file_name), local_path)
         else:
             print '{} exists. Skipping.'
     bp = joblib.load(join(local_dir, 'full_bacpacs.pkl'))
