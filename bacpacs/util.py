@@ -1,10 +1,13 @@
 import subprocess
 import glob
+import joblib
+import urllib
+import warnings
 import numpy as np
 import pandas as pd
 
-from os import unlink
-from os.path import basename, splitext, join
+from os import unlink, mkdir
+from os.path import basename, splitext, join, isdir, isfile
 
 
 def cdhit(input_path, output_path, m, t, cdhit_path):
@@ -130,3 +133,47 @@ def read_labels(csv_path, X=None):
     if y.isnull().any():
         print 'Warning: Labels include null values'
     return y
+
+
+def load_trained_model(output_dir):
+    """Downloads and returns the Bacpacs and sklearn.svm.LinearSVC used to train
+    the official bacpacs model.
+
+    Parameters
+    ----------
+    output_dir : basestring
+        Output directory in which bacpacs will cache files, and store resulting features.
+
+    Returns
+    -------
+    bp : Bacpacs
+        Bacpacs object to generate prediction features.
+    svc : sklearn.svm.LinearSVC
+        Trained estimator to predict new organisms.
+
+    """
+
+    github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
+    file_names = ['full_bacpacs.pkl', 'linearsvc_full.pkl', 'protein_families']
+    local_dir = join(output_dir, 'trained_model')
+    if isdir(output_dir):
+        warnings.warn('Directory {} already exists'.format(output_dir))
+    else:
+        mkdir(output_dir)
+    if isdir(local_dir):
+        warnings.warn('Directory {} already exists'.format(local_dir))
+    else:
+        mkdir(local_dir)
+    print 'Retrieving files from github'
+    for file_name in file_names:
+        local_path = join(local_dir, file_name)
+        if not isfile(local_path):
+            print 'Downloading {}'.format(file_name)
+            urllib.urlretrieve(github_path.format(file_name), local_path)
+        else:
+            print '{} exists. Skipping.'
+    bp = joblib.load(join(local_dir, 'full_bacpacs.pkl'))
+    bp._output_dir = output_dir
+    bp.pf_path_ = join(local_dir, 'protein_families')
+    svc = joblib.load(join(local_dir, 'linearsvc_full.pkl'))
+    return bp, svc
