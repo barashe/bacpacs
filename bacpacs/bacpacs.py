@@ -285,7 +285,6 @@ def load_trained_model(output_dir):
         local_path = join(local_dir, file_name)
         if not isfile(local_path):
             print 'Downloading {}'.format(file_name)
-            print github_path.format(file_name)
             urllib.urlretrieve(github_path.format(file_name), local_path)
         else:
             print '{} exists. Skipping.'
