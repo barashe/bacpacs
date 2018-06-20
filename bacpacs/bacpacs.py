@@ -185,7 +185,7 @@ class Bacpacs(object):
                 else:
                     raise ValueError('No clusters specified. Specify clusters_dir or run self.extract_features()')
             else:
-                if hasattr(self, 'train_clusters_dir_'):
+                if hasattr(self, 'pred_clusters_dir_'):
                     clusters_dir = self.pred_clusters_dir_
                 else:
                     raise ValueError('No clusters specified. Specify clusters_dir or run self.extract_features()')
