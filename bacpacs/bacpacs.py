@@ -212,7 +212,6 @@ class Bacpacs(object):
                 raise ValueError('Protein families path unknown. Please specify pf_path')
         self.feat_list_ = [rec.id for rec in SeqIO.parse(pf_path, 'fasta')]
 
-
     def to_pickle(self, path):
         """Dumps the Bacpacs object to a pickle file
 
