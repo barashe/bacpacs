@@ -68,7 +68,7 @@ def cdhit_2d(org_path, clusters_path, output_dir, m, t, cdhit_path):
     os.unlink(output_path)
 
 
-def orgs_to_vecs(feat_list, clusters_dir, output_path):
+def orgs_to_vecs(feat_list, clusters_dir):
     """Generated a feature pandas.Dataframe, with genome id as index, and protein families features as columns.
 
     Parameters
@@ -95,7 +95,7 @@ def orgs_to_vecs(feat_list, clusters_dir, output_path):
                     tmp_feat = line.split()[2][1:-3]
                 elif line[0] == '1':
                     feat_vec.loc[tmp_feat] = True
-    features.to_pickle(output_path)
+    return features
 
 
 def get_file_name(path):

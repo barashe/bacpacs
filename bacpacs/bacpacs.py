@@ -1,9 +1,8 @@
 import glob
 import warnings
 import joblib
-import pandas as pd
 import os
-import Bio
+from Bio import SeqIO
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
 
@@ -39,9 +38,9 @@ class Bacpacs(object):
         unique = set()
         with open(output_path, 'wb') as out_file:
             for genome_path in raw_seqs_paths:
-                for rec in Bio.SeqIO.parse(genome_path, 'fasta'):
+                for rec in SeqIO.parse(genome_path, 'fasta'):
                     if rec.id not in unique:
-                        Bio.SeqIO.write(rec, out_file, 'fasta')
+                        SeqIO.write(rec, out_file, 'fasta')
                         unique.add(rec.id)
         print 'Saving merged proteins as {}'.format(output_path)
         self.merged_path_ = output_path
@@ -65,18 +64,18 @@ class Bacpacs(object):
             if not hasattr(self, 'merged_path_'):
                 raise ValueError('No merged fasta file')
             merged_path = self.merged_path_
-        lens_and_ids = sorted([(len(rec), rec.id) for rec in Bio.SeqIO.parse(merged_path, 'fasta')], reverse=True)
+        lens_and_ids = sorted([(len(rec), rec.id) for rec in SeqIO.parse(merged_path, 'fasta')], reverse=True)
         ids = [id for (length, id) in lens_and_ids]
         del lens_and_ids
         ids = ids[: len(ids) // long_percent]
-        rec_index = Bio.SeqIO.index(merged_path, 'fasta')
+        rec_index = SeqIO.index(merged_path, 'fasta')
         with open(output_path, 'wb') as out_file:
             for id in ids:
-                Bio.SeqIO.write(rec_index[id], out_file, 'fasta')
+                SeqIO.write(rec_index[id], out_file, 'fasta')
         print 'Saving reduced proteins as {}'.format(output_path)
         self.reduced_path_ = output_path
 
-    def cluster(self, memory=800, n_jobs=1, cdhit_path=None, reduced_path=None, output_path=None):
+    def create_pfs(self, memory=800, n_jobs=1, cdhit_path=None, reduced_path=None, output_path=None):
         """
 
         Parameters
@@ -104,8 +103,8 @@ class Bacpacs(object):
         print 'Clustering finished successfully. Protein families dumped in {}'.format(output_path)
         self.pf_path_ = output_path
 
-    def extract_features(self, genomes_dir, feats_type='pred', memory=800, n_jobs=1, cdhit_path=None,
-                         pf_path=None, output_clusters_dir=None, output_features_path=None):
+    def genomes_vs_pfs(self, genomes_dir, feats_type='pred', memory=800, n_jobs=1, cdhit_path=None,
+                       pf_path=None, output_clusters_dir=None):
         """Creates feature vectors for training/predicting genomes. Runs CD-HIT-2D for every genome, against the
         previously created protein families.
 
@@ -126,9 +125,6 @@ class Bacpacs(object):
         output_clusters_dir : basestring, optional
             Output dir for resulting genome clusters. If None, creates 'train_clusters'/'pred_clusters'
             (depending on 'feats_type') in self.output_dir.
-        output_features_path: basestring, optional
-            Output path for the resulting features. If None, 'pred_feats.pkl'/'train_feats.pkl' (depending on
-            'feats_type') is saved in self.output_dir.
 
         """
         if feats_type == 'pred':
@@ -144,29 +140,22 @@ class Bacpacs(object):
             os.mkdir(output_clusters_dir)
         except Exception:
             raise IOError('Output dir {} already exists.'.format(output_clusters_dir))
-        if output_features_path is None:
-            features_file = 'train_feats.pkl' if training else 'pred_feats.pkl'
-            output_features_path = os.path.join(self._output_dir, features_file)
         if pf_path is None:
             if not hasattr(self, 'pf_path_'):
                 raise ValueError("Please specify a valid 'pf_path' or run self.cluster()")
             pf_path = self.pf_path_
         if not hasattr(self, 'feat_list_'):
-            feat_list = [rec.id for rec in Bio.SeqIO.parse(pf_path, 'fasta')]
-            self.feat_list_ = feat_list
-        feat_list = self.feat_list_
+            self.order_features(pf_path)
         print 'Running genomes against protein families representatives'
         for genome in glob.glob(os.path.join(genomes_dir, '*.faa')):
             cdhit_2d(genome, pf_path, output_clusters_dir, memory, n_jobs, cdhit_path)
-        print 'Organizing features'
-        orgs_to_vecs(feat_list, output_clusters_dir, output_features_path)
-        print 'Done. Features dumped to {}'.format(output_features_path)
+        print 'Genome cluster files are stored in {}'.format(output_clusters_dir)
         if training:
-            self.train_feats_path_ = output_features_path
+            self.train_clusters_dir_ = output_clusters_dir
         else:
-            self.pred_feats_path_ = output_features_path
+            self.pred_clusters_dir_ = output_clusters_dir
 
-    def get_features(self, feats_type='pred', feats_path=None, feat_order=None):
+    def extract_features(self, feats_type='pred', clusters_dir=None):
         """Get features matrix X (pandas.Dataframe) for training/prediction. If 'labels' is not None,
         a series of pathogenicity labels,y (pandas.Series) is returned as well.
 
@@ -174,14 +163,9 @@ class Bacpacs(object):
         ----------
         feats_type : {'train', 'pred'}, optional
             Indication whether genomes are used for training, or for prediction.
-        feats_path : basestring, optional
-            Path to training/prediction (defined in 'feats_type') features. If None, the path used by
-            self.train_feats/self.pred_feats is used (created in self.extract_features()).
-        feat_order : list, optional
-            Order of features for the resulting feature matrix. If not included, the feature list created in the
-            training feature extraction process is used. If this list does not exist (e.g. when loading a model),
-            the train set feature order is recorded, and used for the prediction set. If this doesn't exist, order is
-            not validated and not guaranteed to be consistent.
+        clusters_dir : basestring, optional
+            Path to training/prediction (defined in 'feats_type'). If None, the path used by
+            self.train_clusters_dir_/self.pred_clusters_dir_ is used (created in self.genomes_vs_pfs()).
 
         Returns
         -------
@@ -189,27 +173,46 @@ class Bacpacs(object):
             If labels is None, only features (X) is returned. Otherwise, both features and labels are return in a tuple,
             indexed by genome ids.
         """
+
         if feats_type == 'train':
-            train = True
+            training = True
         elif feats_type == 'pred':
-            train = False
+            training = False
         else:
             raise ValueError("'feats_type should be 'train' or 'pred'")
-        if feats_path is None:
-            if train:
-                feats_path = self.train_feats_path_
+        if clusters_dir is None:
+            if training:
+                if hasattr(self, 'train_clusters_dir_'):
+                    clusters_dir = self.train_clusters_dir_
+                else:
+                    raise ValueError('No clusters specified. Specify clusters_dir or run self.extract_features()')
             else:
-                feats_path = self.pred_feats_path_
-        if feat_order is None:
-            if hasattr(self, 'feat_list_'):
-                feat_order = self.feat_list_
-            else:
-                warnings.warn("Features might not have consistent order. Run self.order_feats() and "
-                              "self.extract_features().")
-        X = pd.read_pickle(feats_path)
-        if feat_order is not None:
-            X = X.loc[:, feat_order]
+                if hasattr(self, 'train_clusters_dir_'):
+                    clusters_dir = self.pred_clusters_dir_
+                else:
+                    raise ValueError('No clusters specified. Specify clusters_dir or run self.extract_features()')
+        if not hasattr(self, 'feat_list_'):
+            raise ValueError("Features are not correctly defined. Run self.extract_features() first or "
+                             "self.order_features()")
+        X = orgs_to_vecs(self.feat_list_, clusters_dir)
         return X
+
+    def order_features(self, pf_path=None):
+        """This method uses a protein families file (pf_path) to make sure features are created in consistent order.
+        It should only be used when running self.extract_features() without first running self.genomes_vs_pfs().
+
+        Parameters
+        ----------
+        pf_path : basestring, optional
+            Path to protein families file. If None, the path used by self.pf_path_ is used (created in self.cluster()).
+
+        """
+        if pf_path is None and hasattr(self, 'pf_path_'):
+            pf_path = self.pf_path_
+        else:
+            raise ValueError('Protein families path unknown. Please specify pf_path')
+        self.feat_list_ = [rec.id for rec in SeqIO.parse(pf_path, 'fasta')]
+
 
     def to_pickle(self, path):
         """Dumps the Bacpacs object to a pickle file
