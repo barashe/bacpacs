@@ -78,7 +78,7 @@ load_trained_model() returns a Bacpacs object, and a sklearn.svm.LinearSVC train
 Here 'bacpacs' is an empty folder, and 'out1' is created when invoking load_trained_model(). An existing output_dir is acceptible as well, but beware of file overrun. 
 
 ### Download toy data
-Use your real data, or download bacpacs toy data (also availbale on Github):
+Use your real data, or download bacpacs toy data (also availbale on [Github](https://github.com/barashe/bacpacs/blob/master/toy.tar.gz)):
 
 ```python
 bacpacs.download_toy_data('.')
@@ -148,7 +148,7 @@ clf.score(X_pred, y_true)
 ## Training and using a model
 
 ### Download toy data
-Use your real data, or download bacpacs toy data (also availbale on Github):
+Use your real data, or download bacpacs toy data (also availbale on [Github](https://github.com/barashe/bacpacs/blob/master/toy.tar.gz)):
 
 ```python
 bacpacs.download_toy_data('.')
