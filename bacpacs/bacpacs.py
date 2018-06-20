@@ -136,10 +136,8 @@ class Bacpacs(object):
         if output_clusters_dir is None:
             dir_name = 'train_clusters' if training else 'pred_clusters'
             output_clusters_dir = os.path.join(self._output_dir, dir_name)
-        try:
+        if not os.path.isdir(output_clusters_dir):
             os.mkdir(output_clusters_dir)
-        except Exception:
-            raise IOError('Output dir {} already exists.'.format(output_clusters_dir))
         if pf_path is None:
             if not hasattr(self, 'pf_path_'):
                 raise ValueError("Please specify a valid 'pf_path' or run self.cluster()")
@@ -207,10 +205,11 @@ class Bacpacs(object):
             Path to protein families file. If None, the path used by self.pf_path_ is used (created in self.cluster()).
 
         """
-        if pf_path is None and hasattr(self, 'pf_path_'):
-            pf_path = self.pf_path_
-        else:
-            raise ValueError('Protein families path unknown. Please specify pf_path')
+        if pf_path is None:
+            if hasattr(self, 'pf_path_'):
+                pf_path = self.pf_path_
+            else:
+                raise ValueError('Protein families path unknown. Please specify pf_path')
         self.feat_list_ = [rec.id for rec in SeqIO.parse(pf_path, 'fasta')]
 
 
