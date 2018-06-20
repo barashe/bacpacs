@@ -1,13 +1,12 @@
 import subprocess
 import glob
+import os
 import joblib
 import urllib
 import warnings
+import tarfile
 import numpy as np
 import pandas as pd
-
-from os import unlink, mkdir
-from os.path import basename, splitext, join, isdir, isfile
 
 
 def cdhit(input_path, output_path, m, t, cdhit_path):
@@ -30,11 +29,11 @@ def cdhit(input_path, output_path, m, t, cdhit_path):
     if cdhit_path is None:
         cdhit_path = 'cd-hit'
     else:
-        cdhit_path = join(cdhit_path, 'cd-hit')
+        cdhit_path = os.path.join(cdhit_path, 'cd-hit')
     cmd_line = '{} -i {} -o {} -c 0.4 -n 2 -M {} -T {}'.format(cdhit_path, input_path, output_path, m, t)
     print cmd_line
     subprocess.check_call(cmd_line.split())
-    unlink(output_path + '.clstr')
+    os.unlink(output_path + '.clstr')
 
 
 def cdhit_2d(org_path, clusters_path, output_dir, m, t, cdhit_path):
@@ -59,14 +58,14 @@ def cdhit_2d(org_path, clusters_path, output_dir, m, t, cdhit_path):
     if cdhit_path is None:
         cdhit_path = 'cd-hit-2d'
     else:
-        cdhit_path = join(cdhit_path, 'cd-hit-2d')
+        cdhit_path = os.path.join(cdhit_path, 'cd-hit-2d')
     org_name = get_file_name(org_path)
-    output_path = join(output_dir, org_name)
+    output_path = os.path.join(output_dir, org_name)
     cmd_line = '{} -i {} -i2 {} -o {} -c 0.4 -n 2 -d 0 -M {} -T {} -g 1'
     cmd_line = cmd_line.format(cdhit_path, clusters_path, org_path, output_path, m, t)
     subprocess.check_call(cmd_line.split())
     # We are only interested in output_path.clstr, which is automatically created by CD-HIT-2D
-    unlink(output_path)
+    os.unlink(output_path)
 
 
 def orgs_to_vecs(feat_list, clusters_dir, output_path):
@@ -83,7 +82,7 @@ def orgs_to_vecs(feat_list, clusters_dir, output_path):
 
     """
 
-    cluster_files = glob.glob(join(clusters_dir, '*.clstr'))
+    cluster_files = glob.glob(os.path.join(clusters_dir, '*.clstr'))
     genome_ids = [get_file_name(cluster_file) for cluster_file in cluster_files]
     ids_and_clusters = pd.Series(cluster_files, genome_ids)
     features = pd.DataFrame(0, index=genome_ids, columns=feat_list, dtype=np.bool)
@@ -100,7 +99,7 @@ def orgs_to_vecs(feat_list, clusters_dir, output_path):
 
 
 def get_file_name(path):
-    return splitext(basename(path))[0]
+    return os.path.splitext(os.path.basename(path))[0]
 
 
 def read_labels(csv_path, X=None):
@@ -155,25 +154,44 @@ def load_trained_model(output_dir):
 
     github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
     file_names = ['full_bacpacs.pkl', 'linearsvc_full.pkl', 'protein_families']
-    local_dir = join(output_dir, 'trained_model')
-    if isdir(output_dir):
+    local_dir = os.path.join(output_dir, 'trained_model')
+    if os.path.isdir(output_dir):
         warnings.warn('Directory {} already exists'.format(output_dir))
     else:
-        mkdir(output_dir)
-    if isdir(local_dir):
+        os.mkdir(output_dir)
+    if os.path.isdir(local_dir):
         warnings.warn('Directory {} already exists'.format(local_dir))
     else:
-        mkdir(local_dir)
+        os.mkdir(local_dir)
     print 'Retrieving files from github'
     for file_name in file_names:
-        local_path = join(local_dir, file_name)
-        if not isfile(local_path):
+        local_path = os.path.join(local_dir, file_name)
+        if not os.path.isfile(local_path):
             print 'Downloading {}'.format(file_name)
             urllib.urlretrieve(github_path.format(file_name), local_path)
         else:
             print '{} exists. Skipping.'
-    bp = joblib.load(join(local_dir, 'full_bacpacs.pkl'))
+    bp = joblib.load(os.path.join(local_dir, 'full_bacpacs.pkl'))
     bp._output_dir = output_dir
-    bp.pf_path_ = join(local_dir, 'protein_families')
-    svc = joblib.load(join(local_dir, 'linearsvc_full.pkl'))
+    bp.pf_path_ = os.path.join(local_dir, 'protein_families')
+    svc = joblib.load(os.path.join(local_dir, 'linearsvc_full.pkl'))
     return bp, svc
+
+
+def download_toy_data(target_directory):
+    """Downloads toy data set from github, and stores it in target_directory/toy.
+
+    Parameters
+    ----------
+    target_directory : basestring
+        Directory to download the toy set directory to
+
+    """
+    local_tar_path = os.path.join(target_directory, 'toy.tar.gz')
+    if os.path.isdir(os.path.join(target_directory, 'toy')):
+        raise ValueError('{} already exists'.format(os.path.join(target_directory, 'toy')))
+    urllib.urlretrieve('https://github.com/barashe/bacpacs/raw/master/toy.tar.gz', local_tar_path)
+    with tarfile.open(local_tar_path) as f:
+        f.extractall()
+    os.remove(local_tar_path)
+    print 'Toy data stored in {}'.format(os.path.join(target_directory, 'toy'))

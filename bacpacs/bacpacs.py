@@ -2,9 +2,8 @@ import glob
 import warnings
 import joblib
 import pandas as pd
-from os import mkdir
-from os.path import join, isdir, isfile
-from Bio import SeqIO
+import os
+import Bio
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
 
@@ -18,10 +17,10 @@ class Bacpacs(object):
             Output directory in which bacpacs will cache files, and store resulting features.
         """
         self._output_dir = output_dir
-        if isdir(output_dir):
+        if os.path.isdir(output_dir):
             warnings.warn('Directory {} already exists'.format(output_dir))
         else:
-            mkdir(output_dir)
+            os.mkdir(output_dir)
 
     def merge_genome_files(self, genomes_dir, output_path=None):
         """Merges the raw training faa files.
@@ -35,14 +34,14 @@ class Bacpacs(object):
 
         """
         if output_path is None:
-            output_path = join(self._output_dir, 'merged.faa')
-        raw_seqs_paths = glob.glob(join(genomes_dir, '*.faa'))
+            output_path = os.path.join(self._output_dir, 'merged.faa')
+        raw_seqs_paths = glob.glob(os.path.join(genomes_dir, '*.faa'))
         unique = set()
         with open(output_path, 'wb') as out_file:
             for genome_path in raw_seqs_paths:
-                for rec in SeqIO.parse(genome_path, 'fasta'):
+                for rec in Bio.SeqIO.parse(genome_path, 'fasta'):
                     if rec.id not in unique:
-                        SeqIO.write(rec, out_file, 'fasta')
+                        Bio.SeqIO.write(rec, out_file, 'fasta')
                         unique.add(rec.id)
         print 'Saving merged proteins as {}'.format(output_path)
         self.merged_path_ = output_path
@@ -61,19 +60,19 @@ class Bacpacs(object):
 
         """
         if output_path is None:
-            output_path = join(self._output_dir, 'reduced.faa')
+            output_path = os.path.join(self._output_dir, 'reduced.faa')
         if merged_path is None:
             if not hasattr(self, 'merged_path_'):
                 raise ValueError('No merged fasta file')
             merged_path = self.merged_path_
-        lens_and_ids = sorted([(len(rec), rec.id) for rec in SeqIO.parse(merged_path, 'fasta')], reverse=True)
+        lens_and_ids = sorted([(len(rec), rec.id) for rec in Bio.SeqIO.parse(merged_path, 'fasta')], reverse=True)
         ids = [id for (length, id) in lens_and_ids]
         del lens_and_ids
         ids = ids[: len(ids) // long_percent]
-        rec_index = SeqIO.index(merged_path, 'fasta')
+        rec_index = Bio.SeqIO.index(merged_path, 'fasta')
         with open(output_path, 'wb') as out_file:
             for id in ids:
-                SeqIO.write(rec_index[id], out_file, 'fasta')
+                Bio.SeqIO.write(rec_index[id], out_file, 'fasta')
         print 'Saving reduced proteins as {}'.format(output_path)
         self.reduced_path_ = output_path
 
@@ -95,7 +94,7 @@ class Bacpacs(object):
 
         """
         if output_path is None:
-            output_path = join(self._output_dir, 'protein_families')
+            output_path = os.path.join(self._output_dir, 'protein_families')
         if reduced_path is None:
             if not hasattr(self, 'reduced_path_'):
                 raise ValueError('No input fasta file')
@@ -140,24 +139,24 @@ class Bacpacs(object):
             raise ValueError("'{}' is not a valid feats_type. Use 'pred' or 'train'")
         if output_clusters_dir is None:
             dir_name = 'train_clusters' if training else 'pred_clusters'
-            output_clusters_dir = join(self._output_dir, dir_name)
+            output_clusters_dir = os.path.join(self._output_dir, dir_name)
         try:
-            mkdir(output_clusters_dir)
+            os.mkdir(output_clusters_dir)
         except Exception:
             raise IOError('Output dir {} already exists.'.format(output_clusters_dir))
         if output_features_path is None:
             features_file = 'train_feats.pkl' if training else 'pred_feats.pkl'
-            output_features_path = join(self._output_dir, features_file)
+            output_features_path = os.path.join(self._output_dir, features_file)
         if pf_path is None:
             if not hasattr(self, 'pf_path_'):
                 raise ValueError("Please specify a valid 'pf_path' or run self.cluster()")
             pf_path = self.pf_path_
         if not hasattr(self, 'feat_list_'):
-            feat_list = [rec.id for rec in SeqIO.parse(pf_path, 'fasta')]
+            feat_list = [rec.id for rec in Bio.SeqIO.parse(pf_path, 'fasta')]
             self.feat_list_ = feat_list
         feat_list = self.feat_list_
         print 'Running genomes against protein families representatives'
-        for genome in glob.glob(join(genomes_dir, '*.faa')):
+        for genome in glob.glob(os.path.join(genomes_dir, '*.faa')):
             cdhit_2d(genome, pf_path, output_clusters_dir, memory, n_jobs, cdhit_path)
         print 'Organizing features'
         orgs_to_vecs(feat_list, output_clusters_dir, output_features_path)
@@ -242,10 +241,10 @@ def read_pickle(path, output_dir):
 
     """
     bp = joblib.load(path)
-    if isdir(output_dir):
+    if os.path.isdir(output_dir):
         warnings.warn('Directory {} already exists'.format(output_dir))
     else:
-        mkdir(output_dir)
+        os.mkdir(output_dir)
     bp._output_dir = output_dir
     return bp
 
