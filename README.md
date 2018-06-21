@@ -35,7 +35,7 @@ Two alternatives to install bacpacs:
 
 Dependencies:
 
--   CD-HIT -- bacpacs requires CD-HIT to be installed It is also recomended to add CD-HIT to the PATH variable. CD-HIT can be downloaded from its official [website](http://weizhongli-lab.org/cd-hit/).
+-   CD-HIT -- bacpacs requires CD-HIT to be installed. It is also recomended to add CD-HIT to the PATH variable. CD-HIT can be downloaded from its official [website](http://weizhongli-lab.org/cd-hit/).
 -   CD-HIT only runs on Linux OS, and so does bacpacs. 
 
 -   Python 2.7.
