@@ -90,6 +90,7 @@ bacpacs.download_toy_data('.')
 
     Toy data stored in ./toy
 
+You can move genomes from toy/train to toy/validate and vice versa, or even delete some.
 
 ### Extract prediction features
 This step takes a while, depending on your machine:
@@ -111,6 +112,8 @@ genomes_vs_pfs() uses CD-HIT-2D to run all prediction genomes against the pre-es
 X_pred = bp.extract_features(feats_type='pred')
 ```
 
+### Read pathogenicity labels from a csv file
+bacpacs.read_labels() takes a csv file, which is expected to have to columns (no headers): genome id, and pathogenicity. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should include an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrix (X_pred), to insure the correct genomes and their order.
 
 ```python
 y_true = bacpacs.read_labels('toy/labels.csv', X=X_pred)
@@ -235,7 +238,8 @@ X_pred = bp.extract_features(feats_type='pred')
 
 ### Extract pathogenicity labels
 
-Here we use read_labels() to extract pathogenicity labels. Note that we include the corresponding feature matrices (X_train and X_pred), to insure the correct genomes and their order.
+### Read pathogenicity labels from a csv file
+bacpacs.read_labels() takes a csv file, which is expected to have to columns (no headers): genome id, and pathogenicity. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should include an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrices (X_train and X_pred), to insure the correct genomes and their order. This way, the same labels.csv file can be used for both sets.
 
 
 ```python
