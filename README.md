@@ -4,7 +4,7 @@ bacpacs V 0.0.5 -- User's guide
 Overview
 --------
 
-bacpacs is a bacterial pathogenicity classification tool. bacpacs
+bacpacs is a bacterial pathogenicity classification python module. bacpacs
 trains using sequenced proteomes. The training pipeline:
 
 1. Considering all proteins, from all training samples, bacpacs samples
@@ -47,7 +47,11 @@ Dependencies:
     [EasyInstall](https://wiki.python.org/moin/EasyInstall).
 
 
-
+Running
+-------
+Below are elaborated running examples of the two possible bacpcas schemes:
+1. Predicting data using bacpacs pre-trained model - bacpacs comes with a pre-trained model, used in the bacpacs paper (in publication preocess). The module enables simple download and usage of the trained model.
+2. Training and using a model - bacpacs can also be used to create features to train a new model, from raw amino acid fasta files (faa files).
 
 ### Imports
 
