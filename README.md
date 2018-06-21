@@ -113,7 +113,7 @@ X_pred = bp.extract_features(feats_type='pred')
 ```
 
 ### Read pathogenicity labels from a csv file
-bacpacs.read_labels() takes a csv file, which is expected to have to columns (no headers): genome id, and pathogenicity. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should include an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrix (X_pred), to insure the correct genomes and their order.
+bacpacs.read_labels() takes a csv file, which is expected to have two columns (no headers): genome id, and pathogenicity. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should include an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrix (X_pred), to insure the correct genomes and their order.
 
 ```python
 y_true = bacpacs.read_labels('toy/labels.csv', X=X_pred)
@@ -236,7 +236,7 @@ X_pred = bp.extract_features(feats_type='pred')
 ### Extract pathogenicity labels
 
 ### Read pathogenicity labels from a csv file
-bacpacs.read_labels() takes a csv file, which is expected to have to columns (no headers): genome id, and pathogenicity. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should include an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrices (X_train and X_pred), to insure the correct genomes and their order. This way, the same labels.csv file can be used for both sets.
+bacpacs.read_labels() takes a csv file, which is expected to have two columns (no headers): genome id, and pathogenicity. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should include an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrices (X_train and X_pred), to insure the correct genomes and their order. This way, the same labels.csv file can be used for both sets.
 
 
 ```python
@@ -249,7 +249,7 @@ Load a linear SVM object:
 clf = LinearSVC(penalty='l1', dual=False)
 ```
 
-Fit it with the fatures and labels created:
+Fit it with the features and labels created:
 ```python
 clf.fit(X_train, y_train)
 ```
