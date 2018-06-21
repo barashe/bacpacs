@@ -118,10 +118,7 @@ bacpacs.read_labels() takes a csv file, which is expected to have to columns (no
 ```python
 y_true = bacpacs.read_labels('toy/labels.csv', X=X_pred)
 ```
-
-X is an optional parameter which uses X_pred to make sure X_pred and y_pred are in the same order.<br><br>
-We can now use clf for prediction:
-
+### Predict pathogenicity
 
 ```python
 y_pred = clf.predict(X_pred)
