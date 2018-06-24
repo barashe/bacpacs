@@ -4,7 +4,7 @@ bacpacs version 0.0.5<br>User's guide
 Overview
 --------
 
-bacpacs is a bacterial pathogenicity classification python module, based on on the following paper: "BacPaCS – Bacterial Pathogenicity Classification via Sparse-SVM", by Eran Barash, Neta Sal-Man, Sivan Sabato, and Michal Ziv-Ukelson (Submitted). It can be used for classification using a pre-trained model, or for generating a new model from labeled training data of sequenced proteomes. The training pipeline:
+bacpacs is a bacterial pathogenicity classification python module, based on the following paper: "BacPaCS – Bacterial Pathogenicity Classification via Sparse-SVM", by Eran Barash, Neta Sal-Man, Sivan Sabato, and Michal Ziv-Ukelson (Submitted). It can be used for classification using a pre-trained model, or for generating a new model from labeled training data of sequenced proteomes. The training pipeline:
 
 1. bacpacs selects the 10% longest protein out of the set of all proteins from all training samples.
 
