@@ -20,15 +20,15 @@ bacpacs is a bacterial pathogenicity classification python module. It can be use
    similar to the representative of PF _i_. Otherwise, the cell's value is `False`.
 
 4. The binary feature vectors of the organisms in the training set (and their known
-   pathogenicity labels), can then be used to train a Linear SVM model (using l1
+   pathogenicity labels), can then be used to train a linear SVM model (using l1
    norm as penalty). Other models can be used as well. 
 
 
 Installation and dependencies
 -----------------------------
 
-Bacpacs can be installed in one of the following two alternatives:
-1. Run in terminal: `$ pip install --index-url https://test.pypi.org/simple/ bacpacs` (recommended)
+Bacpacs can be installed via one of the following two alternatives:
+1. Run in a linux terminal: `$ pip install --index-url https://test.pypi.org/simple/ bacpacs` (recommended)
 2. Clone or download bacpacs Github [repository](https://github.com/barashe/bacpacs.git) and run `pip install -e path/to/bacpacs`
 
 Dependencies:
@@ -49,9 +49,9 @@ Running
 -------
 Below are elaborated running examples of the two possible bacpacs schemes:
 1. Predicting data using bacpacs pre-trained model: bacpacs comes with a pre-trained model, used in the bacpacs paper (in publication process). The pre-trained model can be easily downloaded and used.
-2. Training and using a model: bacpacs can also be used to translate a training set of organisms into a feature vector that can be fed into an SVM training module, and to then translate a test set into a feature vector which uses the corresponding features. The pathogenicity of the organisms in the test set can then be predicted using the trained model. The organisms in both the training set and the test set are fed as raw amino acid fasta files (faa files).
+2. Training and using a model: bacpacs can also be used to translate a training set of organisms into a feature vector that can be fed into an SVM training module, and to then translate a test set into a feature vector which uses the same features as the training set. The pathogenicity of the organisms in the test set can then be predicted using the trained model. The organisms in both the training set and the test set are fed as raw amino acid fasta files (faa files).
 
-The example code below should be used in Python 2.7. Full documentation of each of the methods appears in the code.
+The example code below should be used in Python 2.7. Full documentation of each of the methods appears in the code. This example code can be found in [examples](https://github.com/barashe/bacpacs/tree/master/examples).
 
 
 
@@ -82,7 +82,7 @@ Out[2]
 
 
 load_trained_model() returns a Bacpacs object, and a sklearn.svm.LinearSVC trained classifier. We will need bp for feature extraction, and clf for the prediction itself. 
-Here 'bacpacs' is an empty folder, and 'out1' is created when invoking load_trained_model(). These names can be according set to preference. An existing output_dir is acceptable as well, but beware of file overrun. 
+Here 'bacpacs' is an empty folder, and 'out1' is created when invoking load_trained_model(). These names can be set according to preference. An existing output_dir is acceptable as well, but beware of file overrun. 
 
 ### Download toy data
 Use your real data, or download bacpacs toy data (also available on [Github](https://github.com/barashe/bacpacs/blob/master/toy.tar.gz)):
@@ -120,7 +120,7 @@ X_pred = bp.extract_features(feats_type='pred')
 ```
 
 ### Read pathogenicity labels from a csv file
-bacpacs.read_labels() takes a csv file with two columns and no headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrix (X_pred), to ensure that the order of the returned labels corresponds to the order of the genomes in the feature matrix.
+bacpacs.read_labels() takes a csv file with two columns and no headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrix (X_pred), to ensure that the order of the returned labels corresponds to the order of the genomes in the feature matrix.
 
 In[6]
 ```python
@@ -273,7 +273,7 @@ X_pred = bp.extract_features(feats_type='pred')
 ```
 
 ### Read pathogenicity labels from a csv file
-bacpacs.read_labels() takes a csv file with two columns and no headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome ids should match the original genomes file names. For example: for a genome file named org1.faa, the csv file should list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrices (X_train, X_pred), to ensure that the orders of the returned label sets correspond to the orders of the genomes in the feature matrices.
+bacpacs.read_labels() takes a csv file with two columns and no headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we include the corresponding feature matrices (X_train, X_pred), to ensure that the orders of the returned label sets correspond to the orders of the genomes in the feature matrices.
 
 In[10]
 
