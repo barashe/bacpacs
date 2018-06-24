@@ -4,7 +4,7 @@ bacpacs version 0.0.5<br>User's guide
 Overview
 --------
 
-bacpacs is a bacterial pathogenicity classification python module. It can be used for classification using a pre-trained model, or for generating a new model from labeled training data of sequenced proteomes. The training pipeline:
+bacpacs is a bacterial pathogenicity classification python module, based on on the following paper: "BacPaCS – Bacterial Pathogenicity Classification via Sparse-SVM", by Eran Barash, Neta Sal-Man, Sivan Sabato, and Michal Ziv-Ukelson (Submitted). It can be used for classification using a pre-trained model, or for generating a new model from labeled training data of sequenced proteomes. The training pipeline:
 
 1. bacpacs selects the 10% longest protein out of the set of all proteins from all training samples.
 
@@ -48,7 +48,7 @@ Dependencies:
 Running
 -------
 Below are elaborated running examples of the two possible bacpacs schemes:
-1. Predicting data using bacpacs pre-trained model: bacpacs comes with a pre-trained model, used in the bacpacs paper (in publication process). The pre-trained model can be easily downloaded and used.
+1. Predicting data using bacpacs pre-trained model: bacpacs comes with a pre-trained model, used in the bacpacs paper. The pre-trained model can be easily downloaded and used.
 2. Training and using a model: bacpacs can also be used to translate a training set of organisms into a feature vector that can be fed into an SVM training module, and to then translate a test set into a feature vector which uses the same features as the training set. The pathogenicity of the organisms in the test set can then be predicted using the trained model. The organisms in both the training set and the test set are fed as raw amino acid fasta files (faa files).
 
 The example code below should be used in Python 2.7. Full documentation of each of the methods appears in the code. This example code can be found in [examples](https://github.com/barashe/bacpacs/tree/master/examples).
