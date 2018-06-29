@@ -28,7 +28,7 @@ Installation and dependencies
 -----------------------------
 
 Bacpacs can be installed via one of the following two alternatives:
-1. Run in a linux terminal: `$ pip install --index-url https://test.pypi.org/simple/ bacpacs` (recommended)
+1. Run in a linux terminal: `$ pip install bacpacs` (recommended)
 2. Clone or download bacpacs Github [repository](https://github.com/barashe/bacpacs.git) and run `pip install -e path/to/bacpacs`
 
 Dependencies:
