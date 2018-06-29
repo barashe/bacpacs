@@ -146,6 +146,7 @@ class Bacpacs(object):
             self.order_features(pf_path)
         print 'Running genomes against protein families representatives'
         for genome in glob.glob(os.path.join(genomes_dir, '*.faa')):
+            print 'Processing {}'.format(genome)
             cdhit_2d(genome, pf_path, output_clusters_dir, memory, n_jobs, cdhit_path)
         print 'Genome cluster files are stored in {}'.format(output_clusters_dir)
         if training:
