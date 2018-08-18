@@ -7,6 +7,7 @@ import warnings
 import tarfile
 import json
 import sklearn
+import bacpacs
 import numpy as np
 import pandas as pd
 
@@ -101,7 +102,7 @@ def orgs_to_vecs(feat_list, clusters_dir):
 
 
 def get_file_name(path):
-    return
+    return os.path.splitext(os.path.basename(path))[0]
 
 
 def read_labels(csv_path, X=None):
@@ -156,7 +157,7 @@ def load_trained_model(output_dir):
 
     github_path = 'https://github.com/barashe/bacpacs/raw/develop/trained/{}'
     # github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
-    file_names = ['full_bacpacs.pkl', 'linearsvc_full.json', 'protein_families']
+    file_names = ['full_bacpacs.json', 'linearsvc_full.json', 'protein_families']
     local_dir = os.path.join(output_dir, 'trained_model')
     if os.path.isdir(output_dir):
         warnings.warn('Directory {} already exists'.format(output_dir))
@@ -173,9 +174,8 @@ def load_trained_model(output_dir):
             print 'Downloading {}'.format(file_name)
             urllib.urlretrieve(github_path.format(file_name), local_path)
         else:
-            print '{} exists. Skipping.'
-    bp = joblib.load(os.path.join(local_dir, 'full_bacpacs.pkl'))
-    bp._output_dir = output_dir
+            print '{} exists. Skipping.'.format(file_name)
+    bp = read_json(os.path.join(local_dir, 'full_bacpacs.pkl'), output_dir)
     bp.pf_path_ = os.path.join(local_dir, 'protein_families')
     svc = json_to_clf(os.path.join(local_dir, 'linearsvc_full.json'))
     return bp, svc
@@ -238,3 +238,51 @@ def json_to_clf(path, clf_class=None):
     for attr_name, attr in data['attr'].items():
         setattr(clf, attr_name, np.array(attr))
     return clf
+
+
+def read_pickle(path, output_dir):
+    """Load pickled Bacpacs object.
+
+    Parameters
+    ----------
+    path : basestring
+        File path where the pickled object will be loaded.
+    output_dir : basestring
+        Output directory in which bacpacs will cache files, and store resulting features.
+
+    Returns
+    -------
+    bacpacs : a Bacpacs object
+
+    """
+    bp = joblib.load(path)
+    if os.path.isdir(output_dir):
+        warnings.warn('Directory {} already exists'.format(output_dir))
+    else:
+        os.mkdir(output_dir)
+    bp._output_dir = output_dir
+    return bp
+
+
+def read_json(path, output_dir):
+    """Load JSON Bacpacs object.
+
+        Parameters
+        ----------
+        path : basestring
+            File path where the JSON string will be loaded.
+        output_dir : basestring
+            Output directory in which bacpacs will cache files, and store resulting features.
+
+        Returns
+        -------
+        bacpacs : a Bacpacs object
+
+        """
+    bp = bacpacs.Bacpacs(output_dir)
+    data = json.load(open(path))
+    for attr_name, attr in data.items():
+        if not isinstance(attr, basestring):
+            attr = np.array(attr)
+        setattr(bp, attr_name, attr)
+    return bp

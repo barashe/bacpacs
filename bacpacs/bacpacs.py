@@ -2,6 +2,7 @@ import glob
 import warnings
 import joblib
 import os
+import json
 from Bio import SeqIO
 from util import cdhit, cdhit_2d, orgs_to_vecs
 
@@ -220,33 +221,26 @@ class Bacpacs(object):
         ----------
         path : basestring
             File path where the pickled object will be stored.
-        Returns
-        -------
 
         """
         joblib.dump(self, path)
 
+    def to_json(self, path):
+        """Dumps the Bacpacs object to a JSON file
 
-def read_pickle(path, output_dir):
-    """Load pickled Bacpacs object.
+        Parameters
+        ----------
+        path : basestring
+            File path where the JSON file will be stored.
 
-    Parameters
-    ----------
-    path : basestring
-        File path where the pickled object will be loaded.
-    output_dir : basestring
-        Output directory in which bacpacs will cache files, and store resulting features.
-
-    Returns
-    -------
-    bacpacs : a Bacpacs object
-
-    """
-    bp = joblib.load(path)
-    if os.path.isdir(output_dir):
-        warnings.warn('Directory {} already exists'.format(output_dir))
-    else:
-        os.mkdir(output_dir)
-    bp._output_dir = output_dir
-    return bp
+        """
+        data = dict()
+        for attr_name in dir(self):
+            if attr_name.endswith('_') and '__' not in attr_name:
+                attr = getattr(self, attr_name)
+                if isinstance(attr, basestring):
+                    data[attr_name] = attr
+                else:
+                    data[attr_name] = attr.tolist()
+        json.dump(data, open(path, 'wb'))
 
