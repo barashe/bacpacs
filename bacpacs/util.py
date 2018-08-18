@@ -217,7 +217,7 @@ def clf_to_json(clf, path):
     json.dump(data, open(path, 'wb'))
 
 
-def json_to_clf(path, clf_class=sklearn.svm.LinearSVC):
+def json_to_clf(path, clf_class=None):
     """Loads a Scikit-Learn classifier from a JSON file.
 
     Parameters
@@ -230,6 +230,8 @@ def json_to_clf(path, clf_class=sklearn.svm.LinearSVC):
     -------
     clf : sklearn classifier
     """
+    if clf_class is None:
+        clf_class = sklearn.svm.LinearSVC
     data = json.load(open(path))
     clf = clf_class(**data['params'])
     for attr_name, attr in data['attr'].items():
