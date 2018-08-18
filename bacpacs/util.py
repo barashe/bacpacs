@@ -175,7 +175,7 @@ def load_trained_model(output_dir):
             urllib.urlretrieve(github_path.format(file_name), local_path)
         else:
             print '{} exists. Skipping.'.format(file_name)
-    bp = read_json(os.path.join(local_dir, 'full_bacpacs.pkl'), output_dir)
+    bp = read_json(os.path.join(local_dir, 'full_bacpacs.json'), output_dir)
     bp.pf_path_ = os.path.join(local_dir, 'protein_families')
     svc = json_to_clf(os.path.join(local_dir, 'linearsvc_full.json'))
     return bp, svc
