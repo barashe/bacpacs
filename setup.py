@@ -18,4 +18,11 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
     ),
+    install_requires=[
+        "numpy",
+        "pandas",
+        "scikit-learn",
+        "bio-python",
+
+    ],
 )
