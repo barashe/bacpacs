@@ -22,7 +22,7 @@ setuptools.setup(
         "numpy",
         "pandas",
         "scikit-learn",
-        "bio-python",
+        "biopython",
 
     ],
 )
