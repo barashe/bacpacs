@@ -5,6 +5,8 @@ import joblib
 import urllib
 import warnings
 import tarfile
+import json
+import sklearn
 import numpy as np
 import pandas as pd
 
@@ -99,7 +101,7 @@ def orgs_to_vecs(feat_list, clusters_dir):
 
 
 def get_file_name(path):
-    return os.path.splitext(os.path.basename(path))[0]
+    return
 
 
 def read_labels(csv_path, X=None):
@@ -153,7 +155,7 @@ def load_trained_model(output_dir):
     """
 
     github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
-    file_names = ['full_bacpacs.pkl', 'linearsvc_full.pkl', 'protein_families']
+    file_names = ['full_bacpacs.pkl', 'linearsvc_full.json', 'protein_families']
     local_dir = os.path.join(output_dir, 'trained_model')
     if os.path.isdir(output_dir):
         warnings.warn('Directory {} already exists'.format(output_dir))
@@ -174,7 +176,7 @@ def load_trained_model(output_dir):
     bp = joblib.load(os.path.join(local_dir, 'full_bacpacs.pkl'))
     bp._output_dir = output_dir
     bp.pf_path_ = os.path.join(local_dir, 'protein_families')
-    svc = joblib.load(os.path.join(local_dir, 'linearsvc_full.pkl'))
+    svc = json_to_clf(os.path.join(local_dir, 'linearsvc_full.json'))
     return bp, svc
 
 
@@ -195,3 +197,41 @@ def download_toy_data(target_directory):
         f.extractall()
     os.remove(local_tar_path)
     print 'Toy data stored in {}'.format(os.path.join(target_directory, 'toy'))
+
+
+def clf_to_json(clf, path):
+    """Dumps a Scikit-Learn classifier to a JSON file
+
+    Parameters
+    ----------
+    clf : sklearn classifier
+        Classifier to dump. Classifier must have a self.get_params() method.
+    path : basestring
+        Path for resulting JSON file.
+
+    """
+    attrs = dict((attr, getattr(clf, attr).tolist()) for attr in dir(clf) if attr.endswith('_') and '__' not in attr)
+    data = dict()
+    data['params'] = clf.get_params()
+    data['attr'] = attrs
+    json.dump(data, open(path, 'wb'))
+
+
+def json_to_clf(path, clf_class=sklearn.svm.LinearSVC):
+    """Loads a Scikit-Learn classifier from a JSON file.
+
+    Parameters
+    ----------
+    path : basestring
+        Path of JSON file
+    clf_class :
+        Classifier class to load, matching the stored classifier class.
+    Returns
+    -------
+    clf : sklearn classifier
+    """
+    data = json.load(open(path))
+    clf = clf_class(**data['params'])
+    for attr_name, attr in data['attr'].items():
+        setattr(clf, attr_name, np.array(attr))
+    return clf
