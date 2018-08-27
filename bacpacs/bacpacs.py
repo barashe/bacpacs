@@ -251,50 +251,52 @@ class Bacpacs(object):
 
 modes_string = 'bacpacs operating mode. init: Initiates a bacpacs working directory. Will create a "bp.json" file, ' \
                'which stores previous operations history. merge: Merges the raw training faa files. Reduce: Selects' \
-               ' the longest 10% proteins from the merged fasta file. create_pfs: Runs CD-HIT to cluster the merged ' \
-               'and reduced fasta file to protein families. genomes_vs_pf: Creates feature vectors for ' \
+               ' the longest 10 precent proteins from the merged fasta file. create_pfs: Runs CD-HIT to cluster the' \
+               ' merged and reduced fasta file to protein families. genomes_vs_pf: Creates feature vectors for ' \
                'training/predicting genomes. Runs CD-HIT-2D for every genome, against the previously created' \
-               ' protein families. extract_feats: Get features matrix X (pandas.Dataframe) for training/prediction. ' \
+               ' protein families. extract_feats: Get features matrix X (pandas.DataFrame) for training/prediction. ' \
                'train: Trains a sklearn.svm.LinearSVC model on the extracted feats. predict: Using either the trained' \
                ' classifier trained in "train", or a classifier from a JSON file ' \
                '(created by bacpacs.util.clf_to_json) a prediction is made and stored in a csv file.'
 
+print modes_string
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
     required.add_argument('-m', '--mode', choices=cli.modes.keys(), required=True, help=modes_string)
-    required.add_argument('-w', '--working_directory', required=True, help='Working directory in which bacpacs will'
-                                                                            ' cache files, and store resulting '
-                                                                            'features.')
+    s = 'Working directory in which bacpacs will cache files, and store resulting features.'
+    required.add_argument('-w', '--working_directory', required=True, help=s)
     optional.add_argument('-i', '--input', help='Input file path')
-    optional.add_argument('--genome_input_dir', help='Path to input genomes directory. Required for "merge" and '
-                                                     '"genomes_vs_pfs"')
-    optional.add_argument('--pf_path', help='Path to protein families file, created in "create_pfs". Applies to '
-                                            '"pf_vs_genomes". If not specified, the last created pf_file is used.')
-    optional.add_argument('-o', '--output', help='Output file path. Applies to all modes except "init". If not '
-                                                 'specified, default paths in the working directory are used and '
-                                                 'printed to the screen.')
-    optional.add_argument('-t', '--feats_type', choices=['pred', 'train'], default='pred',
-                          help='Indication whether genomes are used for training, or for prediction. Applies to '
-                               '"genomes_vs_pfs" and "extract_feats"')
+    s = 'Working directory in which bacpacs will cache files, and store resulting features.'
+    optional.add_argument('--genome_input_dir', help=s)
+    s = 'Path to protein families file, created in "create_pfs". Applies to "pf_vs_genomes". If not specified, the' \
+        ' last created pf_file is used.'
+    optional.add_argument('--pf_path', help=s)
+    s = 'Output file path. Applies to all modes except "init". If not specified, default paths in the working ' \
+        'directory are used and printed to the screen.'
+    optional.add_argument('-o', '--output', help=s)
+    s = 'Indication whether genomes are used for training, or for prediction. Applies to "genomes_vs_pfs" and ' \
+        '"extract_feats"'
+    optional.add_argument('-t', '--feats_type', choices=['pred', 'train'], default='pred', help=s)
     optional.add_argument('-r', '--long_ratio', help='Ratio of long proteins to use in "reduce".', type=int, default=10)
-    optional.add_argument('-c', '--clusters_dir', help='Path to training/prediction (defined in --feats_type) clusters.'
-                                                       ' Applies to "extract_feats". If not specified, the'
-                                                       ' directory used by "genomes_vs_pfs" to store clusters is used.')
-    optional.add_argument('-f', '--feats_path', help='Path to training/prediction csv file. Applies to "train" and'
-                                                     ' "predict". If not specified, the path used to store features in'
-                                                     ' "extract_feats" is used.')
+    s = 'Path to training/prediction (defined in --feats_type) clusters. Applies to "extract_feats". If not ' \
+        'specified, the directory used by "genomes_vs_pfs" to store clusters is used.'
+    optional.add_argument('-c', '--clusters_dir', help=s)
+    s = 'Path to training/prediction csv file. Applies to "train" and "predict". If not specified, the path used to' \
+        ' store features in "extract_feats" is used.'
+    optional.add_argument('-f', '--feats_path', help=s)
     optional.add_argument('-l', '--labels_path', help='Path to labels csv file. Applies to "train".')
-    optional.add_argument('--clf', help='Path to scikit-learn classifier, stored in JSON format, using '
-                                        'bacpacs.util.clf_to_json. If not supplied, a new sklearn.svm.LinearSVC is'
-                                        ' used.')
-    optional.add_argument('--cdhit', help='Path to CD-HIT. Only required if CD-HIT not in environmental path. Applies'
-                                          ' to "create_pfs" and "genomes_vf_pfs".')
-    optional.add_argument('--n_jobs', help='Number of threads for CD-HIT-2D. 0 to use all CPUs. Applies to "create_pfs"'
-                                           ' and "genomes_vf_pfs".', type=int, default=1)
-    optional.add_argument('--memory', help='Memory limit (in MB) for CD-HIT, 0 for unlimited. Applies to "create_pfs"'
-                                           ' and "genomes_vf_pfs".', type=int, default=800)
+    s = 'Path to scikit-learn classifier, stored in JSON format, using bacpacs.util.clf_to_json. If not supplied, a ' \
+        'new sklearn.svm.LinearSVC is used.'
+    optional.add_argument('--clf', help=s)
+    s = 'Path to CD-HIT. Only required if CD-HIT not in environmental path. Applies to "create_pfs" and' \
+        ' "genomes_vf_pfs".'
+    optional.add_argument('--cdhit', help=s)
+    s = 'Number of threads for CD-HIT-2D. 0 to use all CPUs. Applies to "create_pfs" and "genomes_vf_pfs".'
+    optional.add_argument('--n_jobs', help=s, type=int, default=1)
+    s = 'Memory limit (in MB) for CD-HIT, 0 for unlimited. Applies to "create_pfs" and "genomes_vf_pfs".'
+    optional.add_argument('--memory', help=s, type=int, default=800)
     args = parser.parse_args()
     sys.exit(cli.modes[args.mode](args))
