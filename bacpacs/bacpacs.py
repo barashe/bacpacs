@@ -241,7 +241,7 @@ class Bacpacs(object):
         for attr_name in dir(self):
             if attr_name.endswith('_') and '__' not in attr_name:
                 attr = getattr(self, attr_name)
-                if isinstance(attr, basestring):
+                if isinstance(attr, [basestring, list]):
                     data[attr_name] = attr
                 else:
                     data[attr_name] = attr.tolist()
