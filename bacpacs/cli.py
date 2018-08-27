@@ -1,6 +1,6 @@
 import os
-import sklearn
 import pandas as pd
+from sklearn.svm import LinearSVC
 import bacpacs
 import util
 
@@ -84,7 +84,7 @@ def train(args):
     else:
         feats_path = args.feats_path
     if args.clf is None:
-        clf = sklearn.svm.LinearSVC('l1', dual=False, class_weight='balanced')
+        clf = LinearSVC('l1', dual=False, class_weight='balanced')
     else:
         clf = util.json_to_clf(args.clf)
     X_train = pd.read_csv(feats_path)
