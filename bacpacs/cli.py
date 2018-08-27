@@ -24,7 +24,11 @@ def run_cli(args):
 
 def init(args):
     wd = args.working_directory
-    bp = bacpacs.Bacpacs(wd)
+    if args.pre_trained:
+        bp, _ = util.load_trained_model(wd)
+        bp.trained_clf_ = os.path.join(wd, 'linearsvc_full.json')
+    else:
+        bp = bacpacs.Bacpacs(wd)
     bp.to_json(os.path.join(wd, 'bp.json'))
     print 'bacpacs initialized in {}'.format(wd)
 

@@ -259,8 +259,6 @@ modes_string = 'bacpacs operating mode. init: Initiates a bacpacs working direct
                ' classifier trained in "train", or a classifier from a JSON file ' \
                '(created by bacpacs.util.clf_to_json) a prediction is made and stored in a csv file.'
 
-print modes_string
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     required = parser.add_argument_group('required arguments')
@@ -298,5 +296,7 @@ if __name__ == '__main__':
     optional.add_argument('--n_jobs', help=s, type=int, default=1)
     s = 'Memory limit (in MB) for CD-HIT, 0 for unlimited. Applies to "create_pfs" and "genomes_vf_pfs".'
     optional.add_argument('--memory', help=s, type=int, default=800)
+    optional.add_argument('--pre_trained', action='store_true',
+                          help='Using the pre-trained bacpacs model. Applies to init.')
     args = parser.parse_args()
     sys.exit(cli.modes[args.mode](args))
