@@ -87,7 +87,7 @@ def train(args):
         clf = LinearSVC('l1', dual=False, class_weight='balanced')
     else:
         clf = util.json_to_clf(args.clf)
-    X_train = pd.read_csv(feats_path)
+    X_train = pd.read_csv(feats_path, index_col=0)
     y_train = util.read_labels(args.labels_path, X_train)
     clf.fit(X_train, y_train)
     if args.output is None:
