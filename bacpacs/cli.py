@@ -105,7 +105,7 @@ def predict(args):
     if args.feats_path is None:
         if not hasattr(bp, 'pred_feats_'):
             raise ValueError('Please provide a valid features path in --feats_path')
-        feats_path = bp.train_feats
+        feats_path = bp.pred_feats_
     else:
         feats_path = args.feats_path
     if args.clf is None:
