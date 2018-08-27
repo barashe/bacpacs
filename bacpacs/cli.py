@@ -97,6 +97,7 @@ def train(args):
     util.clf_to_json(clf, clf_path)
     bp.trained_clf_ = clf_path
     bp.to_json(os.path.join(wd, 'bp.json'))
+    print 'Trained classifier is stored at {}'.format(clf_path)
 
 
 def predict(args):
