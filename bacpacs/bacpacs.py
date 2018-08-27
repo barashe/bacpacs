@@ -262,14 +262,14 @@ if __name__ == '__main__':
     optional.add_argument('-o', '--output', help='Output file path')
     optional.add_argument('-t', '--feats_type', choices=['pred', 'train'], default='pred',
                           help='Indication whether genomes are used for training, or for prediction.')
-    optional.add_argument('-r', '--long_ratio', help='Ratio of long proteins to use', type=float)
+    optional.add_argument('-r', '--long_ratio', help='Ratio of long proteins to use', type=int, default=10)
     optional.add_argument('-c', '--clusters_dir', help='Path to training/prediction (defined in --feats_type) clusters')
     optional.add_argument('-f', '--feats_path', help='Path to training/prediction csv file')
     optional.add_argument('-l', '--labels_path', help='Path to labels csv file, for "train".')
     optional.add_argument('--clf', help='Path to scikit-learn classifier, stored in JSON format, using '
                                         'bacpacs.util.clf_to_json. If not supplied, sklearn.svm.LinearSVC is used.')
     optional.add_argument('--cdhit', help='Path to CD-HIT. Only required if CD-HIT not in environmental path.')
-    optional.add_argument('--n_jobs', help='Number of threads for CD-HIT-2D. 0 to use all CPUs.', type=int)
-    optional.add_argument('--memory', help='Memory limit (in MB) for CD-HIT, 0 for unlimited.', type=int)
+    optional.add_argument('--n_jobs', help='Number of threads for CD-HIT-2D. 0 to use all CPUs.', type=int, default=1)
+    optional.add_argument('--memory', help='Memory limit (in MB) for CD-HIT, 0 for unlimited.', type=int, default=800)
     args = parser.parse_args()
     cli.modes[args.mode](args)
