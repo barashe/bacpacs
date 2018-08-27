@@ -117,7 +117,10 @@ def predict(args):
     clf = util.json_to_clf(clf_path, LinearSVC)
     X_pred = pd.read_csv(feats_path, converters={'genome_id': str}).set_index('genome_id')
     y_pred = pd.Series(clf.predict(X_pred), X_pred.index)
-    pred_csv_path = getattr(args, 'output', os.path.join(wd, 'predictions.csv'))
+    if args.output is None:
+        pred_csv_path = os.path.join(wd, 'predictions.csv')
+    else:
+        pred_csv_path = args.output
     y_pred.to_csv(pred_csv_path)
     print 'Predictions stored at {}'.format(pred_csv_path)
 
