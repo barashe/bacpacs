@@ -114,7 +114,7 @@ def predict(args):
         clf_path = bp.trained_clf_
     else:
         clf_path = args.clf
-    clf = util.json_to_clf(clf_path)
+    clf = util.json_to_clf(clf_path, LinearSVC)
     X_pred = pd.read_csv(feats_path)
     y_pred = clf.predict(X_pred)
     pred_csv_path = getattr(args, 'output', os.path.join(wd, 'predictions.csv'))
