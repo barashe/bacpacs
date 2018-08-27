@@ -85,7 +85,7 @@ def orgs_to_vecs(feat_list, clusters_dir):
     """
 
     cluster_files = glob.glob(os.path.join(clusters_dir, '*.clstr'))
-    genome_ids = [get_file_name(cluster_file) for cluster_file in cluster_files]
+    genome_ids = pd.Series([get_file_name(cluster_file) for cluster_file in cluster_files], name='genome_id')
     ids_and_clusters = pd.Series(cluster_files, genome_ids)
     features = pd.DataFrame(0, index=genome_ids, columns=feat_list, dtype=np.bool)
     for genome_id, feat_vec in features.iterrows():
