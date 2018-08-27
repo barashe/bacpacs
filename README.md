@@ -572,11 +572,33 @@ Now you can simply continue as before, without the clustering and training:
 
 In[2]
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs2 --genome_input_dir my_bp_dir2/toy/validate -t pred 
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m genomes_vs_pfs --genome_input_dir my_bp_dir2/toy/validate -t pred 
 ```
 
 Out[2]
 
     Running genomes against protein families representatives
     Genome cluster files are stored in my_bp_dir2/pred_clusters
+    
+In[3]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m extract_feats -t pred
+```
+
+Out[3]
+
+    Prediction feats stored in my_bp_dir2/pred_feats.csv
+    
+### Predict the validation set pathogenicity labels
+
+In[4]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m pred
+```
+
+Out[4]
+
+    Predictions stored at my_bp_dir2/predictions.clf
 
