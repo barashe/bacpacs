@@ -30,6 +30,7 @@ Installation and dependencies
 Bacpacs can be installed via one of the following two alternatives:
 1. Run in a linux terminal: `$ pip install bacpacs` (recommended)
 2. Clone or download bacpacs Github [repository](https://github.com/barashe/bacpacs.git) and run `pip install -e path/to/bacpacs`
+3. Clone or download bacpacs Github [repository](https://github.com/barashe/bacpacs.git) and use the command line interface described below. 
 
 Dependencies:
 
@@ -38,14 +39,13 @@ Dependencies:
 
 -   Python 2.7.
 
--   Several python packages, including numpy, scipy, and scikit-learn. If
-    you are missing a package, you will get an error stating which package
-    you are missing. Then you can simply install the package using
+-   Python packages: numpy, scipy, scikit-learn, and biopython. If
+    you are missing a package, you can simply install the package using
     [pip](https://pypi.python.org/pypi/pip/) or
     [EasyInstall](https://wiki.python.org/moin/EasyInstall).
 
 
-Running
+Running bacpacs as a python module
 -------
 Below are elaborated running examples of the two possible bacpacs schemes:
 1. Predicting data using bacpacs pre-trained model: bacpacs comes with a pre-trained model, used in the bacpacs paper. The pre-trained model can be easily downloaded and used.
@@ -319,5 +319,264 @@ clf.score(X_pred, y_pred)
 Out[13]
 
     0.80000000000000004
+Trainig a model for prediction using the command line interface
+---------------------------------------------------------------
 
+The flow of bacpacs using the command line, is very similar to using it as python module as described above. 
+Typing 
+
+In[1]
+```bash
+python <path_to_bacpacs> bacpacs/pacpacs.py --h
+```
+
+produces:
+
+Out[1]
+```linux
+usage: bacpacs.py [-h] -m
+                  {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}
+                  -w WORKING_DIRECTORY [-i INPUT]
+                  [--genome_input_dir GENOME_INPUT_DIR] [--pf_path PF_PATH]
+                  [-o OUTPUT] [-t {pred,train}] [-r LONG_RATIO]
+                  [-c CLUSTERS_DIR] [-f FEATS_PATH] [-l LABELS_PATH]
+                  [--clf CLF] [--cdhit CDHIT] [--n_jobs N_JOBS]
+                  [--memory MEMORY]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}, 
+  --mode {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}
+                        bacpacs operating mode. 
+                        init: Initiates a bacpacs
+                        working directory. Will create a "bp.json" file, which
+                        stores previous operations history. 
+                        merge: Merges the raw training faa files. 
+                        Reduce: Selects the longest 10
+                        precent proteins from the merged fasta file.
+                        create_pfs: Runs CD-HIT to cluster the merged and
+                        reduced fasta file to protein families. genomes_vs_pf:
+                        Creates feature vectors for training/predicting
+                        genomes. Runs CD-HIT-2D for every genome, against the
+                        previously created protein families. extract_feats:
+                        Get features matrix X (pandas.DataFrame) for
+                        training/prediction. train: Trains a
+                        sklearn.svm.LinearSVC model on the extracted feats.
+                        predict: Using either the trained classifier trained
+                        in "train", or a classifier from a JSON file (created
+                        by bacpacs.util.clf_to_json) a prediction is made and
+                        stored in a csv file.
+  -w WORKING_DIRECTORY, --working_directory WORKING_DIRECTORY
+                        Working directory in which bacpacs will cache files,
+                        and store resulting features.
+
+optional arguments:
+  -i INPUT, --input INPUT
+                        Input file path
+  --genome_input_dir GENOME_INPUT_DIR
+                        Working directory in which bacpacs will cache files,
+                        and store resulting features.
+  --pf_path PF_PATH     Path to protein families file, created in
+                        "create_pfs". Applies to "pf_vs_genomes". If not
+                        specified, the last created pf_file is used.
+  -o OUTPUT, --output OUTPUT
+                        Output file path. Applies to all modes except "init".
+                        If not specified, default paths in the working
+                        directory are used and printed to the screen.
+  -t {pred,train}, --feats_type {pred,train}
+                        Indication whether genomes are used for training, or
+                        for prediction. Applies to "genomes_vs_pfs" and
+                        "extract_feats"
+  -r LONG_RATIO, --long_ratio LONG_RATIO
+                        Ratio of long proteins to use in "reduce".
+  -c CLUSTERS_DIR, --clusters_dir CLUSTERS_DIR
+                        Path to training/prediction (defined in --feats_type)
+                        clusters. Applies to "extract_feats". If not
+                        specified, the directory used by "genomes_vs_pfs" to
+                        store clusters is used.
+  -f FEATS_PATH, --feats_path FEATS_PATH
+                        Path to training/prediction csv file. Applies to
+                        "train" and "predict". If not specified, the path used
+                        to store features in "extract_feats" is used.
+  -l LABELS_PATH, --labels_path LABELS_PATH
+                        Path to labels csv file. Applies to "train".
+  --clf CLF             Path to scikit-learn classifier, stored in JSON
+                        format, using bacpacs.util.clf_to_json. If not
+                        supplied, a new sklearn.svm.LinearSVC is used.
+  --cdhit CDHIT         Path to CD-HIT. Only required if CD-HIT not in
+                        environmental path. Applies to "create_pfs" and
+                        "genomes_vf_pfs".
+  --n_jobs N_JOBS       Number of threads for CD-HIT-2D. 0 to use all CPUs.
+                        Applies to "create_pfs" and "genomes_vf_pfs".
+  --memory MEMORY       Memory limit (in MB) for CD-HIT, 0 for unlimited.
+                        Applies to "create_pfs" and "genomes_vf_pfs".
+```
+
+### Initialize a working directory
+
+In[1]
+
+```linux 
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir
+```
+
+Out[1]
+
+```linux
+bacpacs initialized in my_bp_dir
+```
+
+-w is the working directory of this bacpacs run. bp.json is stored in the working directory, and it holds information from all running
+steps. The working directory is a required argument, which needs to be passed on each operation. 
+
+### Merge training data
+
+Merge all training .faa files into on large .faa file.
+
+The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
+with `my_bp_dir/toy'. We'll use the toy set for the rest of the running example.
+
+In[2]
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m merge --genome_input_dir my_bp_dir/toy/train/
+```
+Specify an output path to override the default destination directory.
+
+Out[2]
+
+    Saving merged proteins as my_bp_dir/merged.faa
+
+
+Note that it is possible to specify a different output path.
+
+### Reduce the merged file to the 10% longest proteins
+
+In[3]
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m reduce -r 10
+```
+
+Out[3]
+
+    Saving reduced proteins as my_bp_dir/reduced.faa
+
+`-r` can be set to any value between 1 and 100. The number of selected proteins is rounded down if the requested percentage does not result in a whole number. 
+The default merged_path is <working_directory>/merged.faa and the default output_path is <working_directory>/reduced.faa. Both can be set using `--input` and `--output`.
+
+
+### Cluster the training proteins into protein families
+
+In[4]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m create_pfs --memory 800 --n_jobs 0
+```
+
+Out[4]
+
+    Clustering genomes.
+    cd-hit -i out/reduced.faa -o out/protein_families -c 0.4 -n 2 -M 800 -T 0
+    Clustering finished successfully. Protein families dumped in my_bp_dir/protein_families
+
+
+If CD-HIT is included in the system's path, there is no need to provide a path to CD-HIT. If cd-hit is not included in the path, a valid path must be provided using `--cdhit`. 
+Note that we are using n_jobs=0, to use all available CPUs. 
+
+### Create and Extract features
+
+In[5]
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs --genome_input_dir my_bp_dir/toy/train -t train 
+```
+
+Out[5]
+
+    Running genomes against protein families representatives
+    Genome cluster files are stored in my_bp_dir/train_clusters
+
+In[6]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs --genome_input_dir my_bp_toy/toy/validate -t pred
+```
+
+Out[6]
+
+    Running genomes against protein families representatives
+    Genome cluster files are stored in my_bp_dir/pred_clusters
+
+
+In[7]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t train
+```
+
+Out[7]
+
+    Training feats stored in my_bp_dir/train_feats.csv
+    
+ In[8]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t pred
+```
+
+Out[8]
+
+    Prediction feats stored in my_bp_dir/pred_feats.csv
+
+### Train a Linear SVM classifier
+
+In[9]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m train
+```
+
+Out[9]
+
+    Trained classifier is stored at my_bp_dir/trained_clf.json
+    
+### Predict the validation set pathogenicity labels
+
+In[10]
+
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m predict
+```
+
+Out[10]
+
+    Predictions stored at my_bp_dir/predictions.clf
+    
+Using bacpacs trained model for prediction via the command line interface
+-------------------------------------------------------------------------
+
+### Initialize working directory
+
+In[1]
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m init --pre_trained
+```
+
+Out[1]
+
+    bacpacs initialized in my_bp_dir2
+    
+Now you can simply continue as before, without the clustering and training:
+
+### Create and Extract features
+
+In[2]
+```linux
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs2 --genome_input_dir my_bp_dir2/toy/validate -t pred 
+```
+
+Out[2]
+
+    Running genomes against protein families representatives
+    Genome cluster files are stored in my_bp_dir2/pred_clusters
 
