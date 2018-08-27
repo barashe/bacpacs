@@ -1,10 +1,13 @@
 import glob
 import warnings
+import argparse
 import joblib
 import os
 import json
 from Bio import SeqIO
-from util import cdhit, cdhit_2d, orgs_to_vecs
+
+import util
+import cli
 
 
 class Bacpacs(object):
@@ -100,7 +103,7 @@ class Bacpacs(object):
                 raise ValueError('No input fasta file')
             reduced_path = self.reduced_path_
         print 'Clustering genomes.'
-        cdhit(reduced_path, output_path, memory, n_jobs, cdhit_path)
+        util.cdhit(reduced_path, output_path, memory, n_jobs, cdhit_path)
         print 'Clustering finished successfully. Protein families dumped in {}'.format(output_path)
         self.pf_path_ = output_path
 
@@ -148,7 +151,7 @@ class Bacpacs(object):
         print 'Running genomes against protein families representatives'
         for genome in glob.glob(os.path.join(genomes_dir, '*.faa')):
             print 'Processing {}'.format(genome)
-            cdhit_2d(genome, pf_path, output_clusters_dir, memory, n_jobs, cdhit_path)
+            util.cdhit_2d(genome, pf_path, output_clusters_dir, memory, n_jobs, cdhit_path)
         print 'Genome cluster files are stored in {}'.format(output_clusters_dir)
         if training:
             self.train_clusters_dir_ = output_clusters_dir
@@ -164,7 +167,7 @@ class Bacpacs(object):
         feats_type : {'train', 'pred'}, optional
             Indication whether genomes are used for training, or for prediction.
         clusters_dir : basestring, optional
-            Path to training/prediction (defined in 'feats_type'). If None, the path used by
+            Path to training/prediction (defined in 'feats_type') clusters. If None, the path used by
             self.train_clusters_dir_/self.pred_clusters_dir_ is used (created in self.genomes_vs_pfs()).
 
         Returns
@@ -194,7 +197,7 @@ class Bacpacs(object):
         if not hasattr(self, 'feat_list_'):
             raise ValueError("Features are not correctly defined. Run self.extract_features() first or "
                              "self.order_features()")
-        X = orgs_to_vecs(self.feat_list_, clusters_dir)
+        X = util.orgs_to_vecs(self.feat_list_, clusters_dir)
         return X
 
     def order_features(self, pf_path=None):
@@ -244,3 +247,27 @@ class Bacpacs(object):
                     data[attr_name] = attr.tolist()
         json.dump(data, open(path, 'wb'))
 
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    required = parser.add_argument_group('required arguments')
+    optional = parser.add_argument_group('optional arguments')
+    required.add_argument('-m', '--mode', choices=cli.modes.keys(), required=True, help='bacpacs operating mode')
+    required.add_argument('-wd', '--working_directory', required=True, help='Working directory in which bacpacs will'
+                                                                            ' cache files, and store resulting '
+                                                                            'features.')
+    optional.add_argument('-i', '--input', help='Input file path')
+    optional.add_argument('--genome_input_dir', help='Path to input genomes directory')
+    optional.add_argument('--pf_path', help='Path to protein families file, created in "create_pfs".')
+    optional.add_argument('-o', '--output', help='Output file path')
+    optional.add_argument('-t', '--feats_type', choices=['pred', 'train'], default='pred',
+                          help='Indication whether genomes are used for training, or for prediction.')
+    optional.add_argument('-r', '--long_ratio', help='Ratio of long proteins to use')
+    optional.add_argument('-c', '--clusters_dir', help='Path to training/prediction (defined in --feats_type) clusters')
+    optional.add_argument('-f', '--feats_path', help='Path to training/prediction csv file')
+    optional.add_argument('-l', '--labels_path', help='Path to labels csv file, for "train".')
+    optional.add_argument('--clf', help='Path to scikit-learn classifier, stored in JSON format, using '
+                                        'bacpacs.util.clf_to_json. If not supplied, sklearn.svm.LinearSVC is used.')
+    optional.add_argument('--cdhit', help='Path to CD-HIT. Only required if CD-HIT not in environmental path.')
+    args = parser.parse_args()
+    cli.modes[args.mode](args)

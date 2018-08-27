@@ -6,7 +6,6 @@ import urllib
 import warnings
 import tarfile
 import json
-import sklearn
 import bacpacs
 import numpy as np
 import pandas as pd
@@ -215,10 +214,11 @@ def clf_to_json(clf, path):
     data = dict()
     data['params'] = clf.get_params()
     data['attr'] = attrs
+    data['class'] = clf.__class__
     json.dump(data, open(path, 'wb'))
 
 
-def json_to_clf(path, clf_class=None):
+def json_to_clf(path):
     """Loads a Scikit-Learn classifier from a JSON file.
 
     Parameters
@@ -231,9 +231,8 @@ def json_to_clf(path, clf_class=None):
     -------
     clf : sklearn classifier
     """
-    if clf_class is None:
-        clf_class = sklearn.svm.LinearSVC
     data = json.load(open(path))
+    clf_class = data['class']
     clf = clf_class(**data['params'])
     for attr_name, attr in data['attr'].items():
         setattr(clf, attr_name, np.array(attr))
