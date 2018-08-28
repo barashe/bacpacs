@@ -499,7 +499,7 @@ Out[5]
 In[6]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs --genome_input_dir my_bp_toy/toy/validate -t pred
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs --genome_input_dir my_bp_dir/toy/validate -t pred
 ```
 
 Out[6]
