@@ -511,13 +511,8 @@ Out[6]
 In[7]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t train --labels_path my_bp_dir/toy/labels.csv
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t train
 ```
-
-Note the argument --labels_path (or -l in short). The provided path contains a csv file with two columns and no
-headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome
-ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should
-list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. 
 
 Out[7]
 
@@ -538,8 +533,13 @@ Out[8]
 In[9]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m train
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m train --labels_path my_bp_dir/toy/labels.csv
 ```
+
+Note the argument --labels_path (or -l in short). The provided path contains a csv file with two columns and no
+headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome
+ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should
+list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. 
 
 Out[9]
 
