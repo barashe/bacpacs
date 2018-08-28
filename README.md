@@ -608,5 +608,5 @@ $ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m predict
 
 Out[4]
 
-    Predictions stored at my_bp_dir2/predictions.clf
+    Predictions stored at my_bp_dir2/predictions.csv
 
