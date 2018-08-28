@@ -4,8 +4,6 @@ from sklearn.svm import LinearSVC
 import bacpacs
 import util
 
-# modes = ['init', 'merge', 'reduce', 'create_pfs', 'genomes_to_pfs', 'extract']
-
 
 def run_cli(args):
     wd = args.working_directory

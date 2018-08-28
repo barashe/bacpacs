@@ -595,7 +595,7 @@ Out[3]
 In[4]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m pred
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m predict
 ```
 
 Out[4]

@@ -279,7 +279,9 @@ def read_json(path, output_dir):
         bacpacs : a Bacpacs object
 
         """
-    bp = bacpacs.Bacpacs(output_dir)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        bp = bacpacs.Bacpacs(output_dir)
     data = json.load(open(path))
     for attr_name, attr in data.items():
         if not isinstance(attr, basestring):
