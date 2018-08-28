@@ -15,7 +15,7 @@ X_pred = bp.extract_features(clusters_dir='out1/pred_clusters/', feats_type='pre
 
 
 # Read pathogenicity labels from a csv file
-y_true = bacpacs.read_labels('toy/validation_labels.csv', X=X_pred)
+y_true = bacpacs.read_labels('toy/labels.csv', X=X_pred)
 
 # Prediction
 y_pred = clf.predict(X_pred)
