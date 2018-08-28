@@ -48,7 +48,7 @@ class Bacpacs(object):
                         SeqIO.write(rec, out_file, 'fasta')
                         unique.add(rec.id)
         print 'Saving merged proteins as {}'.format(output_path)
-        self.merged_path_ = output_path
+        self.merged_path_ = os.path.abspath(output_path)
 
     def reduce(self, long_percent=10, merged_path=None, output_path=None):
         """Selects the longest 10% proteins from the merged fasta file
@@ -78,7 +78,7 @@ class Bacpacs(object):
             for id in ids:
                 SeqIO.write(rec_index[id], out_file, 'fasta')
         print 'Saving reduced proteins as {}'.format(output_path)
-        self.reduced_path_ = output_path
+        self.reduced_path_ = os.path.abspath(output_path)
 
     def create_pfs(self, memory=800, n_jobs=1, cdhit_path=None, reduced_path=None, output_path=None):
         """Runs CD-HIT to cluster the merged and reduced fasta file to protein families.
@@ -106,7 +106,7 @@ class Bacpacs(object):
         print 'Clustering genomes.'
         util.cdhit(reduced_path, output_path, memory, n_jobs, cdhit_path)
         print 'Clustering finished successfully. Protein families dumped in {}'.format(output_path)
-        self.pf_path_ = output_path
+        self.pf_path_ = os.path.abspath(output_path)
 
     def genomes_vs_pfs(self, genomes_dir, feats_type='pred', memory=800, n_jobs=1, cdhit_path=None,
                        pf_path=None, output_clusters_dir=None):
@@ -155,9 +155,9 @@ class Bacpacs(object):
             util.cdhit_2d(genome, pf_path, output_clusters_dir, memory, n_jobs, cdhit_path)
         print 'Genome cluster files are stored in {}'.format(output_clusters_dir)
         if training:
-            self.train_clusters_dir_ = output_clusters_dir
+            self.train_clusters_dir_ = os.path.abspath(output_clusters_dir)
         else:
-            self.pred_clusters_dir_ = output_clusters_dir
+            self.pred_clusters_dir_ = os.path.abspath(output_clusters_dir)
 
     def extract_features(self, feats_type='pred', clusters_dir=None):
         """Get features matrix X (pandas.Dataframe) for training/prediction. If 'labels' is not None,

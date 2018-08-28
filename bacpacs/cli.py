@@ -24,7 +24,7 @@ def init(args):
     wd = args.working_directory
     if args.pre_trained:
         bp, _ = util.load_trained_model(wd)
-        bp.trained_clf_ = os.path.join(wd, 'trained_model/linearsvc_full.json')
+        bp.trained_clf_ = os.path.abspath(os.path.join(wd, 'trained_model/linearsvc_full.json'))
     else:
         bp = bacpacs.Bacpacs(wd)
     bp.to_json(os.path.join(wd, 'bp.json'))
@@ -97,7 +97,7 @@ def train(args):
     else:
         clf_path = args.output
     util.clf_to_json(clf, clf_path)
-    bp.trained_clf_ = clf_path
+    bp.trained_clf_ = os.path.abspath(clf_path)
     bp.to_json(os.path.join(wd, 'bp.json'))
     print 'Trained classifier is stored at {}'.format(clf_path)
 
