@@ -514,12 +514,10 @@ In[7]
 $ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t train --labels_path my_bp_dir/toy/labels.csv
 ```
 
-Note the argument --labels_path (or -l in short). The provided path contains a csv csv file with two columns and no
+Note the argument --labels_path (or -l in short). The provided path contains a csv file with two columns and no
 headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome
 ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should
-list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. Note that we
-include the corresponding feature matrix (X_pred), to ensure that the order of the returned labels corresponds to the
-order of the genomes in the feature matrix.
+list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. 
 
 Out[7]
 
