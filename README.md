@@ -350,20 +350,20 @@ required arguments:
   -m {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}, 
   --mode {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}
                         bacpacs operating mode. 
-                        init: Initiates a bacpacs
-                        working directory. Will create a "bp.json" file, which
+                        init: Initiates a bacpacs working directory. Will create 
+                        a "bp.json" file, which
                         stores previous operations history. 
                         merge: Merges the raw training faa files. 
-                        Reduce: Selects the longest 10
-                        precent proteins from the merged fasta file.
+                        Reduce: Selects the longest 10 precent proteins from the 
+                        merged fasta file.
                         create_pfs: Runs CD-HIT to cluster the merged and
                         reduced fasta file to protein families. genomes_vs_pf:
                         Creates feature vectors for training/predicting
                         genomes. Runs CD-HIT-2D for every genome, against the
-                        previously created protein families. extract_feats:
-                        Get features matrix X (pandas.DataFrame) for
-                        training/prediction. train: Trains a
-                        sklearn.svm.LinearSVC model on the extracted feats.
+                        previously created protein families. 
+                        extract_feats: Get features matrix X (pandas.DataFrame) for
+                        training/prediction. 
+                        train: Trains a sklearn.svm.LinearSVC model on the extracted feats.
                         predict: Using either the trained classifier trained
                         in "train", or a classifier from a JSON file (created
                         by bacpacs.util.clf_to_json) a prediction is made and
