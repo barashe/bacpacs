@@ -1,4 +1,4 @@
-bacpacs version 0.0.2<br>User's guide
+bacpacs version 0.1.0<br>User's guide
 ==============================
 
 Overview
