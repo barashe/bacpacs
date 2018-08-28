@@ -1,4 +1,4 @@
-bacpacs version 0.0.2<br>User's guide
+bacpacs version 0.1.0<br>User's guide
 ==============================
 
 Overview
@@ -350,20 +350,20 @@ required arguments:
   -m {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}, 
   --mode {merge,init,train,create_pfs,extract_feats,predict,reduce,genomes_vs_pfs}
                         bacpacs operating mode. 
-                        init: Initiates a bacpacs
-                        working directory. Will create a "bp.json" file, which
+                        init: Initiates a bacpacs working directory. Will create 
+                        a "bp.json" file, which
                         stores previous operations history. 
                         merge: Merges the raw training faa files. 
-                        Reduce: Selects the longest 10
-                        precent proteins from the merged fasta file.
+                        Reduce: Selects the longest 10 precent proteins from the 
+                        merged fasta file.
                         create_pfs: Runs CD-HIT to cluster the merged and
                         reduced fasta file to protein families. genomes_vs_pf:
                         Creates feature vectors for training/predicting
                         genomes. Runs CD-HIT-2D for every genome, against the
-                        previously created protein families. extract_feats:
-                        Get features matrix X (pandas.DataFrame) for
-                        training/prediction. train: Trains a
-                        sklearn.svm.LinearSVC model on the extracted feats.
+                        previously created protein families. 
+                        extract_feats: Get features matrix X (pandas.DataFrame) for
+                        training/prediction. 
+                        train: Trains a sklearn.svm.LinearSVC model on the extracted feats.
                         predict: Using either the trained classifier trained
                         in "train", or a classifier from a JSON file (created
                         by bacpacs.util.clf_to_json) a prediction is made and
@@ -499,7 +499,7 @@ Out[5]
 In[6]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs --genome_input_dir my_bp_toy/toy/validate -t pred
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m genomes_vs_pfs --genome_input_dir my_bp_dir/toy/validate -t pred
 ```
 
 Out[6]
@@ -511,13 +511,8 @@ Out[6]
 In[7]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t train --labels_path my_bp_dir/toy/labels.csv
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m extract_feats -t train
 ```
-
-Note the argument --labels_path (or -l in short). The provided path contains a csv file with two columns and no
-headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome
-ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should
-list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. 
 
 Out[7]
 
@@ -538,8 +533,13 @@ Out[8]
 In[9]
 
 ```linux
-$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m train
+$ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir -m train --labels_path my_bp_dir/toy/labels.csv
 ```
+
+Note the argument --labels_path (or -l in short). The provided path contains a csv file with two columns and no
+headers: the first column should list genome ids, and the second column should list pathogenicity labels. Genome
+ids should match the original genome file names. For example: for a genome file named org1.faa, the csv file should
+list an 'org1' genome id. Pathogenicity should be boolean: True for pathogens, False for non-pathogens. 
 
 Out[9]
 
@@ -575,6 +575,9 @@ Now you can simply continue as before, without the clustering and training:
 
 ### Create and Extract features
 
+The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
+with `my_bp_dir2/toy'. We'll use the toy set for the rest of the running example.
+
 In[2]
 ```linux
 $ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m genomes_vs_pfs --genome_input_dir my_bp_dir2/toy/validate -t pred 
@@ -605,5 +608,5 @@ $ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m predict
 
 Out[4]
 
-    Predictions stored at my_bp_dir2/predictions.clf
+    Predictions stored at my_bp_dir2/predictions.csv
 
