@@ -575,6 +575,9 @@ Now you can simply continue as before, without the clustering and training:
 
 ### Create and Extract features
 
+The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
+with `my_bp_dir/toy'. We'll use the toy set for the rest of the running example.
+
 In[2]
 ```linux
 $ python <path_to_bacpacs>/bacpacs.py -w my_bp_dir2 -m genomes_vs_pfs --genome_input_dir my_bp_dir2/toy/validate -t pred 
