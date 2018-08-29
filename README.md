@@ -436,7 +436,7 @@ steps. The working directory is a required argument, which needs to be passed on
 Merge all training .faa files into on large .faa file.
 
 The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
-with `my_bp_dir/toy'. We'll use the toy set for the rest of the running example.
+with `my_bp_dir/toy`. We'll use the toy set for the rest of the running example.
 
 In[2]
 ```linux
@@ -576,7 +576,7 @@ Now you can simply continue as before, without the clustering and training:
 ### Create and Extract features
 
 The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
-with `my_bp_dir2/toy'. We'll use the toy set for the rest of the running example.
+with `my_bp_dir2/toy`. We'll use the toy set for the rest of the running example.
 
 In[2]
 ```linux
