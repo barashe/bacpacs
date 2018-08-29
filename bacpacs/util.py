@@ -155,7 +155,7 @@ def load_trained_model(output_dir):
 
     """
 
-    github_path = 'https://github.com/barashe/bacpacs/raw/develop/trained/{}'
+    github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
     # github_path = 'https://github.com/barashe/bacpacs/raw/master/trained/{}'
     file_names = ['full_bacpacs.json', 'linearsvc_full.json', 'protein_families']
     local_dir = os.path.join(output_dir, 'trained_model')
