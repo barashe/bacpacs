@@ -21,13 +21,13 @@ bacpacs is a bacterial pathogenicity classification python module, based on the 
 
 4. The binary feature vectors of the organisms in the training set (and their known
    pathogenicity labels), can then be used to train a linear SVM model (using l1
-   norm as penalty). Other models can be used as well. 
+   norm as penalty). Other models can be trained as well. 
 
 
 Installation and dependencies
 -----------------------------
 
-Bacpacs can be installed via one of the following two alternatives:
+Bacpacs can be installed via one of the following three alternatives:
 1. Run in a linux terminal: `$ pip install bacpacs` (recommended)
 2. Clone or download bacpacs Github [repository](https://github.com/barashe/bacpacs.git) and run `pip install -e path/to/bacpacs`
 3. Clone or download bacpacs Github [repository](https://github.com/barashe/bacpacs.git) and use the command line interface described below. 
@@ -47,15 +47,17 @@ Dependencies:
 
 Running bacpacs as a python module
 -------
-Below are elaborated running examples of the two possible bacpacs schemes:
+Below are detailed running examples of the two possible bacpacs schemes:
 1. Predicting data using bacpacs pre-trained model: bacpacs comes with a pre-trained model, used in the bacpacs paper. The pre-trained model can be easily downloaded and used.
 2. Training and using a model: bacpacs can also be used to translate a training set of organisms into a feature vector that can be fed into an SVM training module, and to then translate a test set into a feature vector which uses the same features as the training set. The pathogenicity of the organisms in the test set can then be predicted using the trained model. The organisms in both the training set and the test set are fed as raw amino acid fasta files (faa files).
+3. Trainig a model for prediction using the command line interface.
+4. Using bacpacs trained model for prediction via the command line interface.
 
 The example code below should be used in Python 2.7. Full documentation of each of the methods appears in the code. This example code can be found in [examples](https://github.com/barashe/bacpacs/tree/master/examples).
 
 
 
-## Predicting data using bacpacs pre-trained model
+## 1. Predicting data using bacpacs pre-trained model
 
 ### Imports
 
@@ -110,7 +112,7 @@ Out[4]
     Genome cluster files are stored in out1/pred_clusters
 
 
-genomes_vs_pfs() uses CD-HIT-2D to run all test genomes against the pre-established protein families. Assigning n_jobs=0 tells CD-HIT-2D to use all available CPUs for each genome. However, the genomes are processed sequentially independently. Running genomes_vs_pfs() on several machines can save plenty of time. 
+genomes_vs_pfs() uses CD-HIT-2D to run all test genomes against the pre-established protein families. Assigning n_jobs=0 tells CD-HIT-2D to use all available CPUs for each genome. However, the genomes are processed sequentially. Running genomes_vs_pfs() on several machines can save plenty of time. 
 <br><br>Next, extract the features and store them in variables:
 
 In[5]
@@ -161,7 +163,7 @@ Out[9]
 
 
 
-## Training and using a model
+## 2. Training and using a model
 
 ### Imports
 
@@ -193,7 +195,7 @@ bp = bacpacs.Bacpacs('out2')
 
 ### Merge training data
 
-Merge all training .faa files into on large .faa file.
+Merge all training .faa files into one large .faa file.
 
 In[4]
 ```python
@@ -319,8 +321,7 @@ clf.score(X_pred, y_pred)
 Out[13]
 
     0.80000000000000004
-Trainig a model for prediction using the command line interface
----------------------------------------------------------------
+## 3. Training a model for prediction using the command line interface
 
 The flow of bacpacs using the command line, is very similar to using it as python module as described above. 
 Typing 
@@ -433,7 +434,7 @@ steps. The working directory is a required argument, which needs to be passed on
 
 ### Merge training data
 
-Merge all training .faa files into on large .faa file.
+Merge all training .faa files into one large .faa file.
 
 The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
 with `my_bp_dir/toy`. We'll use the toy set for the rest of the running example.
@@ -484,7 +485,7 @@ Out[4]
 If CD-HIT is included in the system's path, there is no need to provide a path to CD-HIT. If cd-hit is not included in the path, a valid path must be provided using `--cdhit`. 
 Note that we are using n_jobs=0, to use all available CPUs. 
 
-### Create and Extract features
+### Create and extract features
 
 In[5]
 ```linux
@@ -557,8 +558,7 @@ Out[10]
 
     Predictions stored at my_bp_dir/predictions.clf
     
-Using bacpacs trained model for prediction via the command line interface
--------------------------------------------------------------------------
+## 4. Using bacpacs trained model for prediction via the command line interface
 
 ### Initialize working directory
 
@@ -573,7 +573,7 @@ Out[1]
     
 Now you can simply continue as before, without the clustering and training:
 
-### Create and Extract features
+### Create and extract features
 
 The bacpacs project includes a toy.tar.gz file. Untar it using `tar -xzvf toy.tar.gz <destination>`. You could replace `<destination>`
 with `my_bp_dir2/toy`. We'll use the toy set for the rest of the running example.
