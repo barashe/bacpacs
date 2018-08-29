@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bacpacs",
-    version="0.1.0",
+    version="0.1.1",
     author="Eran Barash",
     author_email="barashe@post.bgu.ac.il",
     description="Bacterial Pathogenicity Classification via Sparse-SVM",
