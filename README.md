@@ -50,7 +50,7 @@ Running bacpacs as a python module
 Below are detailed running examples of the two possible bacpacs schemes:
 1. Predicting data using bacpacs pre-trained model: bacpacs comes with a pre-trained model, used in the bacpacs paper. The pre-trained model can be easily downloaded and used.
 2. Training and using a model: bacpacs can also be used to translate a training set of organisms into a feature vector that can be fed into an SVM training module, and to then translate a test set into a feature vector which uses the same features as the training set. The pathogenicity of the organisms in the test set can then be predicted using the trained model. The organisms in both the training set and the test set are fed as raw amino acid fasta files (faa files).
-3. Trainig a model for prediction using the command line interface.
+3. Training a model for prediction using the command line interface.
 4. Using bacpacs trained model for prediction via the command line interface.
 
 The example code below should be used in Python 2.7. Full documentation of each of the methods appears in the code. This example code can be found in [examples](https://github.com/barashe/bacpacs/tree/master/examples).
@@ -240,7 +240,7 @@ Out[6]
     Clustering finished successfully. Protein families dumped in out/protein_families
 
 
-If CD-HIT is included in the system's path, there is no need to provide a path to 'cdhit_path'. If cd-hit is not included in the path, a valid path must be provided. 
+If CD-HIT is included in the system's path, there is no need to provide a path to 'cdhit_path'. If CD-HIT is not included in the path, a valid path must be provided. 
 Note that we are using n_jobs=0, to use all available CPUs. 
 
 ### Extract features
@@ -482,7 +482,7 @@ Out[4]
     Clustering finished successfully. Protein families dumped in my_bp_dir/protein_families
 
 
-If CD-HIT is included in the system's path, there is no need to provide a path to CD-HIT. If cd-hit is not included in the path, a valid path must be provided using `--cdhit`. 
+If CD-HIT is included in the system's path, there is no need to provide a path to CD-HIT. If CD-HIT is not included in the path, a valid path must be provided using `--cdhit`. 
 Note that we are using n_jobs=0, to use all available CPUs. 
 
 ### Create and extract features
